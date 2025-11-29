@@ -28,7 +28,7 @@ const MeetTheHOD = () => {
   };
 
   return (
-    <section className="py-16 md:py-24 bg-white font-inter w-full">
+    <section id="hod" className="py-16 md:py-24 bg-white font-inter w-full">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center md:text-left mb-12">
           <div className="flex flex-col md:flex-row md:items-baseline md:space-x-3 mb-4">

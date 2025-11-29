@@ -7,6 +7,7 @@ import MeetTheExecutives from "../features/landing/MeetTheExecutives";
 import MeetTheHOD from "../features/landing/MeetTheHOD";
 import NasowiteOfWeek from "../features/landing/NasowiteOfWeek";
 import OurSponsors from "../features/landing/OurSponsors";
+import QuizLanding from "../features/landing/QuizLanding";
 import UpcomingNewsAndEvents from "../features/landing/UpcomingNewsAndEvents";
 
 export default function Home() {
@@ -15,6 +16,7 @@ export default function Home() {
       <Hero />
       <NasowiteOfWeek/>
       <FlashcardsLanding />
+      <QuizLanding/>
       <ExploreOurCourses/>
       <MeetTheHOD/>
       <MeetOurLecturers/>

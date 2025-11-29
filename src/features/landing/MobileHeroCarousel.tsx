@@ -1,5 +1,6 @@
 import { slides } from "@/src/Data";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -54,9 +55,11 @@ const MobileHeroCarousel = () => {
           }`}
         >
           <div className="absolute h-full">
-            <img
+            <Image
               src={slide.image}
               alt={slide.title}
+              width={1000}
+              height={1000}
               className="w-full h-full object-cover"
               style={{ filter: 'brightness(0.5)' }}
             />

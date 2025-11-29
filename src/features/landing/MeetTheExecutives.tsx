@@ -6,76 +6,40 @@ const MeetTheExecutives = () => {
   const executives = [
     {
       id: 1,
-      name: "Adebayo Chiamaka",
+      name: "Ezechukwu Naomi Onyinyechi",
       position: "President",
       level: "400 Level",
-      image: "/assets/img-car-3.png",
+      image: "/assets/excos/naomi.png",
       bio: "Leading NASOWS with vision and dedication to student welfare",
       email: "president@nasows.com",
       phone: "+234 801 234 5678",
-      instagram: "@chiamaka_nasows",
-      linkedin: "chiamaka-adebayo"
+      instagram: "@eze_naomi",
+      linkedin: "ezechukwu-naomi"
     },
     {
       id: 2,
-      name: "Okonkwo Chidinma",
+      name: "Oluwafemi Philip Oreoluwa",
       position: "Vice President",
       level: "400 Level",
-      image: "/assets/img-car-3.png",
+      image: "/assets/excos/philip.png",
       bio: "Supporting the president and coordinating departmental activities",
       email: "vp@nasows.com",
       phone: "+234 802 345 6789",
-      instagram: "@chidinma_nasows",
-      linkedin: "chidinma-okonkwo"
+      instagram: "@oluwafemi_nasows",
+      linkedin: "oluwafemi-philip"
     },
     {
       id: 3,
-      name: "Adeyemi Tunde",
+      name: "Joshua Joy Temitope",
       position: "General Secretary",
       level: "300 Level",
-      image: "/assets/img-car-3.png",
+      image: "/assets/excos/joy.png",
       bio: "Managing records, communications, and administrative duties",
       email: "secretary@nasows.com",
       phone: "+234 803 456 7890",
-      instagram: "@tunde_nasows",
-      linkedin: "tunde-adeyemi"
+      instagram: "@joy_nasows",
+      linkedin: "joshua-joy"
     },
-    {
-      id: 4,
-      name: "Okeke Blessing",
-      position: "Financial Secretary",
-      level: "300 Level",
-      image: "/assets/img-car-3.png",
-      bio: "Overseeing financial planning and budget management",
-      email: "finance@nasows.com",
-      phone: "+234 804 567 8901",
-      instagram: "@blessing_nasows",
-      linkedin: "blessing-okeke"
-    },
-    {
-      id: 5,
-      name: "Akinola David",
-      position: "Director of Socials",
-      level: "300 Level",
-      image: "/assets/img-car-3.png",
-      bio: "Planning and executing social events and student engagement",
-      email: "socials@nasows.com",
-      phone: "+234 805 678 9012",
-      instagram: "@david_nasows",
-      linkedin: "david-akinola"
-    },
-    {
-      id: 6,
-      name: "Nwosu Grace",
-      position: "Public Relations Officer",
-      level: "200 Level",
-      image: "/assets/img-car-3.png",
-      bio: "Managing external communications and brand representation",
-      email: "pro@nasows.com",
-      phone: "+234 806 789 0123",
-      instagram: "@grace_nasows",
-      linkedin: "grace-nwosu"
-    }
   ];
 
   return (

@@ -6,16 +6,16 @@ const NasowiteOfWeek = () => {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const nasowite = {
-    name: "Adebayo Chiamaka",
+    name: "Ezechukwu Naomi Onyinyechi",
     level: "400 Level",
     position: "President, NASOWS UNILAG",
     image: "/assets/img-car-3.png", 
     quote: "Empowering social workers to create lasting change in our communities.",
     socials: {
-      instagram: "@chiamaka_ade",
-      twitter: "@chiamaka_sw",
-      linkedin: "chiamaka-adebayo",
-      email: "chiamaka@nasows.com",
+      instagram: "@eze_naomi",
+      twitter: "@naomi_sw",
+      linkedin: "ezechukwu-naomi",
+      email: "ezechukwu@nasows.com",
       phone: "+234 801 234 5678"
     },
     achievements: [

@@ -12,8 +12,7 @@ const navItems = [
     url: "/about",
     dropdown: [
       { name: "About Us", url: "/about" },
-      { name: "Meet the HOD", url: "/hod" },
-      { name: "Our Mission & Vision", url: "/mission" }
+      { name: "Meet the HOD", url: "/#hod" },
     ]
   },
   { 
@@ -23,7 +22,7 @@ const navItems = [
     dropdown: [
       { name: "Current Executives", url: "/executives" },
       { name: "Past Executives", url: "/past-executives" },
-      { name: "Meet the Team", url: "/executives/team" }
+      { name: "Our Lecturers", url: "/lecturers" }
     ]
   },
   { 
@@ -32,8 +31,8 @@ const navItems = [
     url: "/academics",
     dropdown: [
       { name: "Courses", url: "/courses" },
-      { name: "Our Lecturers", url: "/lecturers" },
       { name: "Flashcards", url: "/flashcards" },
+      { name: "Quizzes", url: "/quiz" },
       { name: "Study Resources", url: "/resources" }
     ]
   },
