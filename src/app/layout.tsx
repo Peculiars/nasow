@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "../features/landing/Navbar";
-import Footer from "../features/landing/Footer";
+import LayoutWrapper from "../components/LayoutWrapper";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -12,13 +11,15 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.nasow.com"),
   title: "Nasow UNILAG",
-  description: "Nasow UNILAG is a platform dedicated to connecting students and alumni of the University of Lagos (UNILAG) for networking, collaboration, and career development opportunities.",
+  description:
+    "Nasow UNILAG is a platform dedicated to connecting students and alumni of the University of Lagos (UNILAG) for networking, collaboration, and career development opportunities.",
   icons: {
     icon: "/favicon.ico",
   },
   openGraph: {
     title: "Nasow UNILAG",
-    description: "Nasow UNILAG is a platform dedicated to connecting students and alumni of the University of Lagos (UNILAG) for networking, collaboration, and career development opportunities.",
+    description:
+      "Nasow UNILAG is a platform dedicated to connecting students and alumni of the University of Lagos (UNILAG) for networking, collaboration, and career development opportunities.",
     url: "https://www.nasow.com/",
     siteName: "Nasow UNILAG",
     images: [
@@ -34,22 +35,17 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Nasow UNILAG",
-    description: "Nasow UNILAG is a platform dedicated to connecting students and alumni of the University of Lagos (UNILAG) for networking, collaboration, and career development opportunities.",
+    description:
+      "Nasow UNILAG is a platform dedicated to connecting students and alumni of the University of Lagos (UNILAG) for networking, collaboration, and career development opportunities.",
     images: ["/assets/logo.svg"],
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased`} >
-        <Navbar/>
-        {children}
-        <Footer/>
+      <body className={`${inter.variable} antialiased`}>
+        <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
   );
