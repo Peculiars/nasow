@@ -129,7 +129,6 @@ const Navbar = () => {
               </div>
             ))}
             
-            {/* Portal Button */}
             <Link 
               href="/portal" 
               className="ml-4 inline-flex items-center gap-2 rounded-xl bg-[#9179E0] px-6 py-3 text-white font-semibold shadow-lg hover:shadow-xl hover:bg-[#7E6BDB] transition-all duration-300 hover:scale-105"
@@ -139,7 +138,6 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Mobile Menu Button */}
           <button 
             onClick={() => setIsOpen(!isOpen)} 
             className="lg:hidden p-3 rounded-xl hover:bg-gray-50 transition-all duration-300" 

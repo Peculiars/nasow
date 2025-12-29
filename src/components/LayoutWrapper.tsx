@@ -7,9 +7,10 @@ import Footer from "../features/landing/Footer";
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const hiddenRoutes = ["/login", "/signup", "/admin"];
-
-  const shouldHide = hiddenRoutes.includes(pathname);
+  const shouldHide =
+    pathname.startsWith("/admin") ||
+    pathname === "/login" ||
+    pathname === "/signup";
 
   return (
     <>

@@ -1,10 +1,14 @@
 "use client";
+import { ChevronLeft, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 const AdminSidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState("/admin");
+  const pathname = usePathname();
+  const router = useRouter();
 
   const menuItems = [
     { title: "Dashboard", href: "/admin", badge: null, iconPath: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
@@ -18,25 +22,22 @@ const AdminSidebar = () => {
   ];
 
   const isActive = (href: string) => {
-    if (href === "/admin") return currentPath === "/admin";
-    return currentPath.startsWith(href);
-  };
+  if (href === "/admin") return pathname === "/admin";
+  return pathname.startsWith(href);
+};
 
   return (
     <div className="font-inter">
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-[#9179E0] text-white rounded-lg shadow-lg"
+        className="lg:hidden fixed top-4 right-4 z-50 p-2 bg-[#9179E0] text-white rounded-lg shadow-lg"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {isMobileOpen ? (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <X className="size-5 text-white"/>
           ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            <Menu className="size-5 text-white"/>
           )}
-        </svg>
       </button>
-
       {isMobileOpen && (
         <div className="lg:hidden fixed inset-0 bg-black/50 z-40" onClick={() => setIsMobileOpen(false)} />
       )}
@@ -45,33 +46,19 @@ const AdminSidebar = () => {
         <div className="flex flex-col h-full">
           <div className="p-6 border-b-2 border-gray-200">
             <div className="flex items-center justify-between">
-              {isSidebarOpen ? (
+              {isSidebarOpen && (
                 <div>
                   <h2 className="text-xl font-bold text-[#4a368f]">NASOWS</h2>
                   <p className="text-xs text-gray-600">Admin Portal</p>
                 </div>
-              ) : (
-                <div className="text-center w-full">
-                  <span className="text-2xl font-bold text-[#4a368f]">N</span>
-                </div>
               )}
               <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="hidden lg:block p-1.5 hover:bg-gray-100 rounded-lg">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+                {isSidebarOpen ? (
+                  <ChevronLeft className="size-5 text-gray-700" />
+                ) : (
+                  <Menu className="size-5 text-gray-700" />
+                )}
               </button>
-            </div>
-          </div>
-
-          <div className="p-4 border-b-2 border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-[#9179E0] to-[#7E6BDB] rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">AC</div>
-              {isSidebarOpen && (
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-gray-900 truncate">Admin User</p>
-                  <p className="text-xs text-gray-600 truncate">Administrator</p>
-                </div>
-              )}
             </div>
           </div>
 
@@ -82,7 +69,7 @@ const AdminSidebar = () => {
                 return (
                   <button
                     key={item.href}
-                    onClick={() => { setCurrentPath(item.href); setIsMobileOpen(false); }}
+                    onClick={() => { router.push(item.href); setIsMobileOpen(false); }}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${active ? "bg-[#9179E0] text-white shadow-lg" : "text-gray-700 hover:bg-gray-100"}`}
                   >
                     <svg className={`w-5 h-5 flex-shrink-0 ${active ? "text-white" : "text-gray-600"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,7 +92,7 @@ const AdminSidebar = () => {
           </nav>
 
           <div className="p-4 border-t-2 border-gray-200 space-y-1">
-            <button onClick={() => setCurrentPath("/admin/settings")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${currentPath === "/admin/settings" ? "bg-[#9179E0] text-white" : "text-gray-700 hover:bg-gray-100"}`}>
+            <button onClick={() => router.push("/admin/settings")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${currentPath === "/admin/settings" ? "bg-[#9179E0] text-white" : "text-gray-700 hover:bg-gray-100"}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -120,30 +107,6 @@ const AdminSidebar = () => {
           </div>
         </div>
       </aside>
-
-      <div className={`min-h-screen bg-gray-50 transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "lg:ml-20"}`}>
-        <div className="p-8 lg:p-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">{menuItems.find(i => i.href === currentPath)?.title || "Dashboard"}</h1>
-          <p className="text-gray-600 mb-8">Content area for admin pages</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { label: "Total Students", value: "245", change: "+12%", color: "purple" },
-              { label: "Flashcards", value: "520", change: "+8%", color: "blue" },
-              { label: "Active Quizzes", value: "12", change: "+15%", color: "yellow" },
-              { label: "Upcoming Events", value: "8", change: "+5%", color: "green" }
-            ].map((stat, i) => (
-              <div key={i} className="bg-white rounded-2xl border-2 border-gray-200 p-6">
-                <div className="flex justify-between mb-4">
-                  <div className={`w-12 h-12 bg-${stat.color}-100 rounded-xl`}></div>
-                  <span className="text-sm font-medium text-green-600">{stat.change}</span>
-                </div>
-                <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-                <p className="text-sm text-gray-600">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

@@ -15,9 +15,18 @@ export default async function AdminLayout({
   }
 
   return (
-    <div>
-        <AdminSidebar />
-      <main>{children}</main>
+    <div className="min-h-screen bg-slate-50">
+      <AdminSidebar />
+      <main
+        className="
+          lg:ml-64
+          ml-0
+          transition-all
+          duration-300
+        "
+      >
+        {children}
+      </main>
     </div>
   );
 }
