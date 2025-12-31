@@ -1,3 +1,4 @@
+"use client"
 import { ArrowRight, Mail, Phone, Instagram, Linkedin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";

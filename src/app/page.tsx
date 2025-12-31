@@ -1,4 +1,3 @@
-"use client"
 import ExploreOurCourses from "../features/landing/ExploreOurCourses";
 import FlashcardsLanding from "../features/landing/Flashcard";
 import Hero from "../features/landing/Hero";

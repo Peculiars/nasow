@@ -1,3 +1,4 @@
+"use client"
 import { useState } from "react";
 import { Instagram, Twitter, Linkedin, Mail, Phone, MapPin } from "lucide-react";
 import Image from "next/image";

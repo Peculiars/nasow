@@ -43,6 +43,7 @@ export interface ICourse extends Document {
   level: Level;
   studentType: StudentType;
   lecturerName: string;
+  description: string;
   coverImage: {
     url: string;
     publicId: string;

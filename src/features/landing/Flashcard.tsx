@@ -1,3 +1,4 @@
+"use client"
 import { useState } from "react";
 import { BookOpen, Zap, Target, TrendingUp, ArrowRight, Sparkles, Brain, Award, Clock } from "lucide-react";
 import Link from "next/link";
