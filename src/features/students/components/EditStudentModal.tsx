@@ -1,14 +1,27 @@
 import { X } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { EditStudentModalProps } from '../schema';
-import { UpdateStudentPayload } from '@/src/lib/types/students';
+import { Student, UpdateStudentPayload, StudentLevel, StudentType } from '@/src/lib/types/students';
 
-export default function EditStudentModal({ isOpen, onClose, onSave, student }: EditStudentModalProps) {
+interface EditStudentModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (data: UpdateStudentPayload) => Promise<void>;
+  student: Student | null;
+}
+
+export default function EditStudentModal({
+  isOpen,
+  onClose,
+  onSave,
+  student
+}: EditStudentModalProps) {
   const [formData, setFormData] = useState<UpdateStudentPayload>({
     firstName: '',
     lastName: '',
     phoneNumber: '',
-    email: ''
+    email: '',
+    level: undefined,
+    studentType: undefined
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -19,7 +32,9 @@ export default function EditStudentModal({ isOpen, onClose, onSave, student }: E
         firstName: student.firstName,
         lastName: student.lastName,
         phoneNumber: student.phoneNumber || '',
-        email: student.email
+        email: student.email,
+        level: student.level,
+        studentType: student.studentType
       });
     }
   }, [student]);
@@ -65,7 +80,7 @@ export default function EditStudentModal({ isOpen, onClose, onSave, student }: E
   };
 
   const handleClose = () => {
-    setFormData({ firstName: '', lastName: '', phoneNumber: '', email: '' });
+    setFormData({ firstName: '', lastName: '', phoneNumber: '', email: '', level: undefined, studentType: undefined });
     setErrors({});
     onClose();
   };

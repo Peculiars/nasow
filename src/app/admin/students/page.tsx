@@ -1,14 +1,20 @@
 "use client";
+
 import { useState, useEffect, useCallback } from 'react';
 import { Users, UserCheck, UserX, Ban, TrendingUp, Download } from 'lucide-react';
 import { Student, StudentFilters, StudentStats, UpdateStudentPayload } from '@/src/lib/types/students';
+import { showError, showPromise, showSuccess } from '@/src/lib/toast';
+import { exportStudentsToCSV } from '@/src/lib/utils';
+import ToastProvider from '@/src/components/ToastProvider';
 import AdminSidebar from '@/src/features/admin/AdminSidebar';
 import StatsCard from '@/src/features/students/components/StatsCard';
 import StudentsFilters from '@/src/features/students/components/StudentsFilters';
-import StudentsTable from '@/src/features/students/components/StudentsTable';
+import BulkActionsToolbar from '@/src/features/students/components/BulkActionsToolbar';
 import Pagination from '@/src/features/students/components/Pagination';
-import EditStudentModal from '@/src/features/students/components/EditStudentModal';
 import ActionModal from '@/src/features/students/components/ActionModal';
+import EditStudentModal from '@/src/features/students/components/EditStudentModal';
+import BulkActionModal from '@/src/features/students/components/BulkActionModal';
+import StudentsTable from '@/src/features/students/components/StudentsTable';
 
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
@@ -25,6 +31,9 @@ export default function StudentsPage() {
     type: 'suspend' | 'ban' | 'activate' | 'delete' | null;
     student: Student | null;
   }>({ type: null, student: null });
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkAction, setBulkAction] = useState<'suspend' | 'ban' | 'activate' | 'delete' | null>(null);
 
   const itemsPerPage = 10;
 
@@ -53,6 +62,7 @@ export default function StudentsPage() {
       setTotalItems(data.pagination.total);
     } catch (error) {
       console.error('Error fetching students:', error);
+      showError('Failed to load students');
     } finally {
       setIsLoading(false);
     }
@@ -80,11 +90,13 @@ export default function StudentsPage() {
   const handleFilterChange = (newFilters: StudentFilters) => {
     setFilters(newFilters);
     setCurrentPage(1);
+    setSelectedIds([]);
   };
 
   const handleResetFilters = () => {
     setFilters({});
     setCurrentPage(1);
+    setSelectedIds([]);
   };
 
   const handleEdit = (student: Student) => {
@@ -96,13 +108,21 @@ export default function StudentsPage() {
     if (!selectedStudent) return;
 
     try {
-      const response = await fetch(`/api/admin/students/${selectedStudent._id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-
-      if (!response.ok) throw new Error('Failed to update student');
+      await showPromise(
+        fetch(`/api/admin/students/${selectedStudent._id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        }).then(res => {
+          if (!res.ok) throw new Error('Failed to update student');
+          return res.json();
+        }),
+        {
+          loading: 'Updating student...',
+          success: 'Student updated successfully',
+          error: 'Failed to update student'
+        }
+      );
 
       await fetchStudents();
       await fetchStats();
@@ -110,7 +130,6 @@ export default function StudentsPage() {
       setSelectedStudent(null);
     } catch (error) {
       console.error('Error updating student:', error);
-      alert('Failed to update student. Please try again.');
     }
   };
 
@@ -123,21 +142,39 @@ export default function StudentsPage() {
 
     try {
       if (actionModal.type === 'delete') {
-        const response = await fetch(`/api/admin/students/${actionModal.student._id}`, {
-          method: 'DELETE'
-        });
-        if (!response.ok) throw new Error('Failed to delete student');
+        await showPromise(
+          fetch(`/api/admin/students/${actionModal.student._id}`, {
+            method: 'DELETE'
+          }).then(res => {
+            if (!res.ok) throw new Error('Failed to delete student');
+            return res.json();
+          }),
+          {
+            loading: 'Deleting student...',
+            success: 'Student deleted successfully',
+            error: 'Failed to delete student'
+          }
+        );
       } else {
-        const response = await fetch('/api/admin/students/actions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            studentId: actionModal.student._id,
-            action: actionModal.type,
-            reason
-          })
-        });
-        if (!response.ok) throw new Error(`Failed to ${actionModal.type} student`);
+        await showPromise(
+          fetch('/api/admin/students/actions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              studentId: actionModal.student._id,
+              action: actionModal.type,
+              reason
+            })
+          }).then(res => {
+            if (!res.ok) throw new Error(`Failed to ${actionModal.type} student`);
+            return res.json();
+          }),
+          {
+            loading: `${actionModal.type.charAt(0).toUpperCase() + actionModal.type.slice(1)}ing student...`,
+            success: `Student ${actionModal.type}d successfully`,
+            error: `Failed to ${actionModal.type} student`
+          }
+        );
       }
 
       await fetchStudents();
@@ -145,7 +182,85 @@ export default function StudentsPage() {
       setActionModal({ type: null, student: null });
     } catch (error) {
       console.error(`Error performing ${actionModal.type} action:`, error);
-      alert(`Failed to ${actionModal.type} student. Please try again.`);
+    }
+  };
+
+  const handleSelectStudent = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(sid => sid !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = (selected: boolean) => {
+    if (selected) {
+      setSelectedIds(students.map(s => s._id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleBulkAction = (action: 'suspend' | 'ban' | 'activate' | 'delete') => {
+    if (selectedIds.length === 0) {
+      showError('Please select at least one student');
+      return;
+    }
+    setBulkAction(action);
+  };
+
+  const handleConfirmBulkAction = async (reason?: string) => {
+    if (!bulkAction) return;
+
+    try {
+      await showPromise(
+        fetch('/api/admin/students/bulk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            studentIds: selectedIds,
+            action: bulkAction,
+            reason
+          })
+        }).then(res => {
+          if (!res.ok) throw new Error(`Failed to ${bulkAction} students`);
+          return res.json();
+        }),
+        {
+          loading: `${bulkAction.charAt(0).toUpperCase() + bulkAction.slice(1)}ing ${selectedIds.length} student(s)...`,
+          success: `Successfully ${bulkAction}d ${selectedIds.length} student(s)`,
+          error: `Failed to ${bulkAction} students`
+        }
+      );
+
+      await fetchStudents();
+      await fetchStats();
+      setSelectedIds([]);
+      setBulkAction(null);
+    } catch (error) {
+      console.error(`Error performing bulk ${bulkAction}:`, error);
+    }
+  };
+
+  const handleExportSelected = () => {
+    const selectedStudents = students.filter(s => selectedIds.includes(s._id));
+    exportStudentsToCSV(selectedStudents, `students-selected-${new Date().toISOString().split('T')[0]}.csv`);
+    showSuccess(`Exported ${selectedStudents.length} student(s) to CSV`);
+  };
+
+  const handleExportAll = async () => {
+    try {
+      const params = new URLSearchParams({ limit: '10000' });
+      if (filters.status) params.append('status', filters.status);
+      if (filters.search) params.append('search', filters.search);
+
+      const response = await fetch(`/api/admin/students?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch all students');
+
+      const data = await response.json();
+      exportStudentsToCSV(data.data, `students-all-${new Date().toISOString().split('T')[0]}.csv`);
+      showSuccess(`Exported ${data.data.length} student(s) to CSV`);
+    } catch (error) {
+      console.error('Error exporting all students:', error);
+      showError('Failed to export students');
     }
   };
 
@@ -191,113 +306,153 @@ export default function StudentsPage() {
   const actionModalConfig = getActionModalConfig();
 
   return (
-    <div className="min-h-screen bg-gray-50 font-inter">
-      <div className="p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Students Management</h1>
-            <p className="text-gray-600 mt-2">Manage and monitor all registered students</p>
-          </div>
+    <>
+      <ToastProvider />
+      <div className="min-h-screen bg-gray-50 font-inter">
+        
+        <div className="p-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Students Management</h1>
+                <p className="text-gray-600 mt-2">Manage and monitor all registered students</p>
+              </div>
+              <button
+                onClick={handleExportAll}
+                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors"
+              >
+                <Download className="h-4 w-4" />
+                Export All
+              </button>
+            </div>
 
-          {stats && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-              <StatsCard
-                title="Total Students"
-                value={stats.totalStudents}
-                icon={<Users className="h-6 w-6" />}
-                color="purple"
-              />
-              <StatsCard
-                title="Active"
-                value={stats.activeStudents}
-                icon={<UserCheck className="h-6 w-6" />}
-                color="green"
-              />
-              <StatsCard
-                title="Suspended"
-                value={stats.suspendedStudents}
-                icon={<UserX className="h-6 w-6" />}
-                color="yellow"
-              />
-              <StatsCard
-                title="Banned"
-                value={stats.bannedStudents}
-                icon={<Ban className="h-6 w-6" />}
-                color="red"
-              />
-              <StatsCard
-                title="Avg Score"
-                value={stats.averageScore}
-                icon={<TrendingUp className="h-6 w-6" />}
-                color="blue"
+            {stats && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+                <StatsCard
+                  title="Total Students"
+                  value={stats.totalStudents}
+                  icon={<Users className="h-6 w-6" />}
+                  color="purple"
+                />
+                <StatsCard
+                  title="Active"
+                  value={stats.activeStudents}
+                  icon={<UserCheck className="h-6 w-6" />}
+                  color="green"
+                />
+                <StatsCard
+                  title="Suspended"
+                  value={stats.suspendedStudents}
+                  icon={<UserX className="h-6 w-6" />}
+                  color="yellow"
+                />
+                <StatsCard
+                  title="Banned"
+                  value={stats.bannedStudents}
+                  icon={<Ban className="h-6 w-6" />}
+                  color="red"
+                />
+                <StatsCard
+                  title="Avg Score"
+                  value={stats.averageScore}
+                  icon={<TrendingUp className="h-6 w-6" />}
+                  color="blue"
+                />
+              </div>
+            )}
+
+            <div className="mb-6">
+              <StudentsFilters
+                filters={filters}
+                onFilterChange={handleFilterChange}
+                onReset={handleResetFilters}
               />
             </div>
-          )}
 
-          <div className="mb-6">
-            <StudentsFilters
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              onReset={handleResetFilters}
-            />
+            {selectedIds.length > 0 && (
+              <div className="mb-6">
+                <BulkActionsToolbar
+                  selectedCount={selectedIds.length}
+                  onClearSelection={() => setSelectedIds([])}
+                  onSuspend={() => handleBulkAction('suspend')}
+                  onBan={() => handleBulkAction('ban')}
+                  onActivate={() => handleBulkAction('activate')}
+                  onDelete={() => handleBulkAction('delete')}
+                  onExport={handleExportSelected}
+                />
+              </div>
+            )}
+
+            {isLoading ? (
+              <div className="bg-white rounded-xl border-2 border-gray-200 p-12 text-center">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#9179E0] border-t-transparent"/>
+                <p className="text-gray-600 mt-4">Loading students...</p>
+              </div>
+            ) : students.length === 0 ? (
+              <div className="bg-white rounded-xl border-2 border-gray-200 p-12 text-center">
+                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600">No students found matching your criteria</p>
+              </div>
+            ) : (
+              <>
+                <StudentsTable
+                  students={students}
+                  onView={(student) => console.log('View:', student)}
+                  onEdit={handleEdit}
+                  onSuspend={(student) => handleAction('suspend', student)}
+                  onBan={(student) => handleAction('ban', student)}
+                  onActivate={(student) => handleAction('activate', student)}
+                  onDelete={(student) => handleAction('delete', student)}
+                  selectedIds={selectedIds}
+                  onSelectStudent={handleSelectStudent}
+                  onSelectAll={handleSelectAll}
+                />
+
+                {totalPages > 1 && (
+                  <div className="mt-6">
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={setCurrentPage}
+                      totalItems={totalItems}
+                      itemsPerPage={itemsPerPage}
+                    />
+                  </div>
+                )}
+              </>
+            )}
           </div>
-
-          {isLoading ? (
-            <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#9179E0] border-t-transparent"></div>
-            <p className="mt-4 text-gray-600">Loading students...</p>
-          </div>
-          ) : students.length === 0 ? (
-            <div className="bg-white rounded-xl border-2 border-gray-200 p-12 text-center">
-              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">No students found matching your criteria</p>
-            </div>
-          ) : (
-            <>
-              <StudentsTable
-                students={students}
-                onView={(student) => console.log('View:', student)}
-                onEdit={handleEdit}
-                onSuspend={(student) => handleAction('suspend', student)}
-                onBan={(student) => handleAction('ban', student)}
-                onActivate={(student) => handleAction('activate', student)}
-                onDelete={(student) => handleAction('delete', student)}
-              />
-
-              {totalPages > 1 && (
-                <div className="mt-6">
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                    totalItems={totalItems}
-                    itemsPerPage={itemsPerPage}
-                  />
-                </div>
-              )}
-            </>
-          )}
         </div>
-      </div>
 
-      <EditStudentModal
-        isOpen={isEditModalOpen}
-        onClose={() => {
-          setIsEditModalOpen(false);
-          setSelectedStudent(null);
-        }}
-        onSave={handleSaveEdit}
-        student={selectedStudent}
-      />
-
-      {actionModalConfig && (
-        <ActionModal
-          isOpen={!!actionModal.type}
-          onClose={() => setActionModal({ type: null, student: null })}
-          onConfirm={handleConfirmAction}
-          {...actionModalConfig}
+        <EditStudentModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedStudent(null);
+          }}
+          onSave={handleSaveEdit}
+          student={selectedStudent}
         />
-      )}
-    </div>
+
+        {actionModalConfig && (
+          <ActionModal
+            isOpen={!!actionModal.type}
+            onClose={() => setActionModal({ type: null, student: null })}
+            onConfirm={handleConfirmAction}
+            {...actionModalConfig}
+          />
+        )}
+
+        {bulkAction && (
+          <BulkActionModal
+            isOpen={!!bulkAction}
+            onClose={() => setBulkAction(null)}
+            onConfirm={handleConfirmBulkAction}
+            selectedCount={selectedIds.length}
+            action={bulkAction}
+          />
+        )}
+      </div>
+    </>
   );
 }

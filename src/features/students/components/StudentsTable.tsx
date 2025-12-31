@@ -1,11 +1,37 @@
+import { Student, StudentStatus } from '../../../lib/types/students';
 import { MoreVertical, Eye, Edit, Ban, UserX, CheckCircle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
-import { StudentsTableProps } from '../schema';
-import { StudentStatus } from '@/src/lib/types/students';
 
-export default function StudentsTable({ students, onView, onEdit, onSuspend, onBan, onActivate, onDelete }: StudentsTableProps) {
+interface StudentsTableProps {
+  students: Student[];
+  onView: (student: Student) => void;
+  onEdit: (student: Student) => void;
+  onSuspend: (student: Student) => void;
+  onBan: (student: Student) => void;
+  onActivate: (student: Student) => void;
+  onDelete: (student: Student) => void;
+  selectedIds: string[];
+  onSelectStudent: (id: string) => void;
+  onSelectAll: (selected: boolean) => void;
+}
+
+export default function StudentsTable({
+  students,
+  onView,
+  onEdit,
+  onSuspend,
+  onBan,
+  onActivate,
+  onDelete,
+  selectedIds,
+  onSelectStudent,
+  onSelectAll
+}: StudentsTableProps) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
+  const allSelected = students.length > 0 && students.every(s => selectedIds.includes(s._id));
+  const someSelected = students.some(s => selectedIds.includes(s._id));
 
   const getStatusBadge = (status: StudentStatus) => {
     const badges = {
@@ -30,11 +56,25 @@ export default function StudentsTable({ students, onView, onEdit, onSuspend, onB
         <table className="w-full">
           <thead className="bg-gray-50 border-b-2 border-gray-200">
             <tr>
+              <th className="px-6 py-4 text-left">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  ref={input => {
+                    if (input) input.indeterminate = someSelected && !allSelected;
+                  }}
+                  onChange={(e) => onSelectAll(e.target.checked)}
+                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded cursor-pointer"
+                />
+              </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Student
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Contact
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Level/Type
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Status
@@ -55,7 +95,18 @@ export default function StudentsTable({ students, onView, onEdit, onSuspend, onB
           </thead>
           <tbody className="divide-y divide-gray-200">
             {students.map((student) => (
-              <tr key={student._id} className="hover:bg-gray-50 transition-colors">
+              <tr 
+                key={student._id} 
+                className={`hover:bg-gray-50 transition-colors ${selectedIds.includes(student._id) ? 'bg-purple-50' : ''}`}
+              >
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(student._id)}
+                    onChange={() => onSelectStudent(student._id)}
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded cursor-pointer"
+                  />
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="h-10 w-10 flex-shrink-0">
@@ -70,7 +121,7 @@ export default function StudentsTable({ students, onView, onEdit, onSuspend, onB
                       ) : (
                         <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
                           <span className="text-purple-600 font-semibold text-sm">
-                            {student.firstName[0]}{student.lastName[0]}
+                            {(student.firstName?.[0] ?? '') + (student.lastName?.[0] ?? '')}
                           </span>
                         </div>
                       )}
@@ -79,7 +130,7 @@ export default function StudentsTable({ students, onView, onEdit, onSuspend, onB
                       <div className="text-sm font-medium text-gray-900">
                         {student.firstName} {student.lastName}
                       </div>
-                      <div className="text-xs text-gray-500">ID: {student._id.slice(-6)}</div>
+                      <div className="text-xs text-gray-500">ID: {student._id ? student._id.slice(-6) : 'N/A'}</div>
                     </div>
                   </div>
                 </td>
@@ -90,19 +141,23 @@ export default function StudentsTable({ students, onView, onEdit, onSuspend, onB
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-medium text-gray-900">{student.level ?? 'N/A'}</div>
+                  <div className="text-xs text-gray-500">{student.studentType ?? 'Not set'}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border ${getStatusBadge(student.status)}`}>
                     {student.status}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-semibold text-gray-900">{student.totalScore}</div>
-                  <div className="text-xs text-gray-500">Avg: {student.averageScore || 0}</div>
+                  <div className="text-sm font-semibold text-gray-900">{student.totalScore ?? 0}</div>
+                  <div className="text-xs text-gray-500">Avg: {student.averageScore ?? 0}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {student.quizzesTaken}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {formatDate(student.registrationDate)}
+                  {student.registrationDate ? formatDate(student.registrationDate) : 'N/A'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium relative">
                   <button
@@ -118,7 +173,7 @@ export default function StudentsTable({ students, onView, onEdit, onSuspend, onB
                         className="fixed inset-0 z-10" 
                         onClick={() => setOpenMenuId(null)}
                       />
-                      <div className="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white border-2 border-gray-200 z-20">
+                      <div className="absolute z-[1000] right-0 mt-2 w-48 rounded-lg shadow-lg bg-white border-2 border-gray-200">
                         <div className="py-1">
                           <button
                             onClick={() => { onView(student); setOpenMenuId(null); }}

@@ -6,6 +6,19 @@ export enum StudentStatus {
   BANNED = 'banned'
 }
 
+export enum StudentLevel {
+  LEVEL_100 = '100L',
+  LEVEL_200 = '200L',
+  LEVEL_300 = '300L',
+  LEVEL_400 = '400L',
+  LEVEL_500 = '500L'
+}
+
+export enum StudentType {
+  FULL_TIME = 'Full-time',
+  ICE = 'ICE'
+}
+
 export interface IStudent extends Document {
   kindeId: string;
   email: string;
@@ -13,6 +26,9 @@ export interface IStudent extends Document {
   lastName: string;
   phoneNumber?: string;
   profileImage?: string;
+  level?: StudentLevel;
+  studentType?: StudentType;
+  profileCompleted: boolean;
   status: StudentStatus;
   totalScore: number;
   quizzesTaken: number;
@@ -61,6 +77,19 @@ const studentSchema = new Schema<IStudent>(
     },
     profileImage: {
       type: String
+    },
+    level: {
+      type: String,
+      enum: Object.values(StudentLevel)
+    },
+    studentType: {
+      type: String,
+      enum: Object.values(StudentType)
+    },
+    profileCompleted: {
+      type: Boolean,
+      default: false,
+      index: true
     },
     status: {
       type: String,

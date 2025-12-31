@@ -1,12 +1,13 @@
 "use client";
 import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 const CoursesPage = () => {
+    const router = useRouter();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState({ level: "", studentType: "", status: "", search: "" });
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     fetchCourses();
@@ -33,6 +34,8 @@ const CoursesPage = () => {
       setLoading(false);
     }
   };
+
+  console.log("Courses:", courses);
 
   const deleteCourse = async (id: string) => {
     if (!confirm("Are you sure you want to delete this course? This action cannot be undone.")) {
@@ -64,7 +67,7 @@ const CoursesPage = () => {
             <p className="text-gray-600 mt-1">Manage all course materials and content</p>
           </div>
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => router.push("/admin/courses/create")}
             className="md:px-6 px-3 py-3 md:py-3 bg-[#9179E0] text-white font-bold rounded-xl hover:bg-[#7E6BDB] transition-all shadow-lg flex items-center gap-2"
           >
             <Plus className="w-5 h-5 hidden md:block" />
@@ -207,21 +210,6 @@ const CoursesPage = () => {
                 </div>
               </div>
             ))}
-          </div>
-        )}
-
-        {showCreateModal && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl max-w-4xl w-full p-8">
-              <h2 className="text-2xl font-bold mb-4">Create New Course</h2>
-              <p className="text-gray-600">Form will be implemented in next step...</p>
-              <button
-                onClick={() => setShowCreateModal(false)}
-                className="mt-4 px-6 py-2 bg-gray-200 rounded-lg"
-              >
-                Close
-              </button>
-            </div>
           </div>
         )}
       </div>

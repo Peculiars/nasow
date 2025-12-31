@@ -30,7 +30,7 @@ const navItems = [
     name: "Academics", 
     url: "/academics",
     dropdown: [
-      { name: "Courses", url: "/courses" },
+      { name: "Courses", url: "/portal/courses" },
       { name: "Flashcards", url: "/flashcards" },
       { name: "Quizzes", url: "/quiz" },
       { name: "Study Resources", url: "/resources" }

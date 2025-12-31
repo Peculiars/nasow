@@ -1,6 +1,16 @@
 import { X } from 'lucide-react';
 import { useState } from 'react';
-import { ActionModalProps } from '../schema';
+
+interface ActionModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (reason?: string) => void;
+  title: string;
+  description: string;
+  confirmText: string;
+  confirmColor: 'red' | 'yellow' | 'green';
+  requireReason?: boolean;
+}
 
 const colorClasses = {
   red: 'bg-red-600 hover:bg-red-700 focus:ring-red-500',
@@ -8,7 +18,16 @@ const colorClasses = {
   green: 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
 };
 
-export default function ActionModal({ isOpen, onClose, onConfirm, title, description, confirmText, confirmColor, requireReason = false }: ActionModalProps) {
+export default function ActionModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  description,
+  confirmText,
+  confirmColor,
+  requireReason = false
+}: ActionModalProps) {
   const [reason, setReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 

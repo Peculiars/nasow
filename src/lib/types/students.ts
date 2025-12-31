@@ -4,6 +4,19 @@ export enum StudentStatus {
   BANNED = 'banned'
 }
 
+export enum StudentLevel {
+  LEVEL_100 = '100L',
+  LEVEL_200 = '200L',
+  LEVEL_300 = '300L',
+  LEVEL_400 = '400L',
+  LEVEL_500 = '500L'
+}
+
+export enum StudentType {
+  FULL_TIME = 'Full-time',
+  ICE = 'ICE'
+}
+
 export interface Student {
   _id: string;
   kindeId: string;
@@ -12,6 +25,9 @@ export interface Student {
   lastName: string;
   phoneNumber?: string;
   profileImage?: string;
+  level?: StudentLevel;
+  studentType?: StudentType;
+  profileCompleted: boolean;
   status: StudentStatus;
   totalScore: number;
   quizzesTaken: number;
@@ -32,11 +48,14 @@ export interface Student {
 
 export interface StudentFilters {
   status?: StudentStatus;
+  level?: StudentLevel;
+  studentType?: StudentType;
   search?: string;
   minScore?: number;
   maxScore?: number;
   startDate?: string;
   endDate?: string;
+  profileCompleted?: boolean;
 }
 
 export interface StudentStats {
@@ -46,6 +65,7 @@ export interface StudentStats {
   bannedStudents: number;
   averageScore: number;
   totalQuizzesTaken: number;
+  profileCompletionRate: number;
 }
 
 export interface PaginatedResponse<T> {
@@ -63,6 +83,14 @@ export interface UpdateStudentPayload {
   lastName?: string;
   phoneNumber?: string;
   email?: string;
+  level?: StudentLevel;
+  studentType?: StudentType;
+}
+
+export interface CompleteProfilePayload {
+  level: StudentLevel;
+  studentType: StudentType;
+  phoneNumber?: string;
 }
 
 export interface StudentActionPayload {

@@ -8,7 +8,6 @@ interface UploadResult {
   fileSize: number;
 }
 
-
 export async function uploadCourseImage(
   file: File
 ): Promise<UploadResult> {
@@ -46,7 +45,7 @@ export async function uploadCourseImage(
     return {
       url: result.secure_url,
       publicId: result.public_id,
-      fileType: result.format,
+      fileType: result.format || 'image',
       fileSize: result.bytes
     };
   } catch (error) {
@@ -69,7 +68,7 @@ export async function uploadCourseMaterial(
       throw new Error('Only PDF and DOC/DOCX files are allowed');
     }
 
-    const maxSize = 10 * 1024 * 1024; 
+    const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
       throw new Error('File size must be less than 10MB');
     }
@@ -96,7 +95,7 @@ export async function uploadCourseMaterial(
     return {
       url: result.secure_url,
       publicId: result.public_id,
-      fileType: result.format,
+      fileType: result.format || file.type.split('/')[1] || 'pdf',
       fileSize: result.bytes
     };
   } catch (error) {
@@ -104,7 +103,6 @@ export async function uploadCourseMaterial(
     throw error;
   }
 }
-
 
 export async function deleteFromCloudinary(
   publicId: string,
@@ -118,7 +116,6 @@ export async function deleteFromCloudinary(
     throw new Error('Failed to delete file from Cloudinary');
   }
 }
-
 
 export async function deleteMultipleFromCloudinary(
   publicIds: string[],
