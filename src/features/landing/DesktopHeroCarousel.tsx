@@ -7,18 +7,23 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 const HeroCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isAutoPlaying || !mounted) return;
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+  }, [isAutoPlaying, mounted]);
 
-  const goToSlide = (index:number) => {
+  const goToSlide = (index: number) => {
     setCurrentSlide(index);
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 10000);
@@ -35,6 +40,12 @@ const HeroCarousel = () => {
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
+
+  if (!mounted) {
+    return (
+      <div className="relative w-full bg-[#6B46C1] min-h-[550px] md:min-h-[600px] lg:min-h-[650px]" />
+    );
+  }
 
   return (
     <div className="relative w-full overflow-hidden bg-[#6B46C1]">
@@ -73,6 +84,7 @@ const HeroCarousel = () => {
                 style={{ objectPosition: 'left center' }}
                 priority={index === 0}
                 quality={75}
+                unoptimized={process.env.NODE_ENV === 'development'}
               />
             </div>
           </div>

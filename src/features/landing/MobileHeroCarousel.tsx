@@ -16,16 +16,21 @@ interface Slide {
 const MobileHeroCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState<number>(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState<boolean>(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isAutoPlaying || !mounted) return;
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+  }, [isAutoPlaying, mounted]);
 
   const goToSlide = (index: number): void => {
     setCurrentSlide(index);
@@ -45,6 +50,12 @@ const MobileHeroCarousel = () => {
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
+  if (!mounted) {
+    return (
+      <div className="relative h-[90vh] overflow-hidden bg-black font-inter" />
+    );
+  }
+
   return (
     <div className="relative h-[90vh] overflow-hidden bg-black font-inter">
       {slides.map((slide: Slide, index: number) => (
@@ -54,14 +65,17 @@ const MobileHeroCarousel = () => {
             index === currentSlide ? "opacity-100" : "opacity-0"
           }`}
         >
-          <div className="absolute h-full">
+          <div className="absolute inset-0 h-full w-full">
             <Image
               src={slide.image}
               alt={slide.title}
-              width={1000}
-              height={1000}
-              className="w-full h-full object-cover"
+              fill
+              sizes="100vw"
+              className="object-cover"
               style={{ filter: 'brightness(0.5)' }}
+              priority={index === 0}
+              quality={75}
+              unoptimized={process.env.NODE_ENV === 'development'}
             />
           </div>
 
