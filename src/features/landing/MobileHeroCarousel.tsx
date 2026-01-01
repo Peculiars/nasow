@@ -74,8 +74,7 @@ const MobileHeroCarousel = () => {
               className="object-cover"
               style={{ filter: 'brightness(0.5)' }}
               priority={index === 0}
-              quality={75}
-              unoptimized={process.env.NODE_ENV === 'development'}
+              quality={95}
             />
           </div>
 

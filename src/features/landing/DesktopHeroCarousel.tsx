@@ -79,12 +79,11 @@ const HeroCarousel = () => {
                 src={slide.image}
                 alt={slide.title}
                 fill
-                sizes="50vw"
+                sizes="100vw"
                 className="object-cover"
                 style={{ objectPosition: 'left center' }}
                 priority={index === 0}
-                quality={75}
-                unoptimized={process.env.NODE_ENV === 'development'}
+                quality={95}
               />
             </div>
           </div>

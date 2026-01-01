@@ -1,38 +1,72 @@
-"use client"
-import { useState } from "react";
-import { Instagram, Twitter, Linkedin, Mail, Phone, MapPin } from "lucide-react";
+"use client";
+import { useState, useEffect } from "react";
+import { Instagram, Twitter, Linkedin, Mail, Phone } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+
+interface Nasowite {
+  _id: string;
+  name: string;
+  level: string;
+  position: string;
+  image: string;
+  quote: string;
+  socials: {
+    instagram?: string;
+    twitter?: string;
+    linkedin?: string;
+    email: string;
+    phone?: string;
+  };
+  achievements: string[];
+}
 
 const NasowiteOfWeek = () => {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [nasowite, setNasowite] = useState<Nasowite | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const nasowite = {
-    name: "Ezechukwu Naomi Onyinyechi",
-    level: "400 Level",
-    position: "President, NASOWS UNILAG",
-    image: "/assets/img-car-3.png", 
-    quote: "Empowering social workers to create lasting change in our communities.",
-    socials: {
-      instagram: "@eze_naomi",
-      twitter: "@naomi_sw",
-      linkedin: "ezechukwu-naomi",
-      email: "ezechukwu@nasows.com",
-      phone: "+234 801 234 5678"
-    },
-    achievements: [
-      "Led 5+ community outreach programs",
-      "President's List for Academic Excellence",
-      "Volunteer Coordinator, Red Cross"
-    ]
+  useEffect(() => {
+    fetchCurrentNasowite();
+  }, []);
+
+  const fetchCurrentNasowite = async () => {
+    try {
+      const res = await fetch("/api/nasowites?current=true");
+      const data = await res.json();
+      if (data.success && data.data) {
+        setNasowite(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to load current nasowite");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <section className="py-16 md:py-24 bg-gray-50 font-inter w-full">
+        <div className="px-6 max-w-7xl mx-auto lg:px-8">
+          <div className="flex items-center justify-center h-96">
+            <div className="w-12 h-12 border-4 border-[#9179E0] border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!nasowite) {
+    return null;
+  }
 
   return (
     <section className="py-16 md:py-24 bg-gray-50 font-inter w-full">
       <div className="px-6 max-w-7xl mx-auto lg:px-8">
         <div className="text-center md:text-left mb-12">
-          <div className="flex space-x-2 items-baseline">
+          <div className="flex space-x-2 items-baseline justify-center md:justify-start">
             <div className="size-6 bg-green-500 hidden md:block"/>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#4a368f]">NASOWITE of the Week</h2>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#4a368f]">Nasowite of the Week</h2>
           </div>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto md:mx-0">
             Celebrating outstanding members making a difference in our community
@@ -88,27 +122,39 @@ const NasowiteOfWeek = () => {
                   Connect
                 </h4>
                 <div className="space-y-3">
-                  <a
-                    href={`https://instagram.com/${nasowite.socials.instagram.replace('@', '')}`}
-                    className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors"
-                  >
-                    <Instagram className="w-5 h-5" />
-                    <span>{nasowite.socials.instagram}</span>
-                  </a>
-                  <a
-                    href={`https://twitter.com/${nasowite.socials.twitter.replace('@', '')}`}
-                    className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors"
-                  >
-                    <Twitter className="w-5 h-5" />
-                    <span>{nasowite.socials.twitter}</span>
-                  </a>
-                  <a
-                    href={`https://linkedin.com/in/${nasowite.socials.linkedin}`}
-                    className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors"
-                  >
-                    <Linkedin className="w-5 h-5" />
-                    <span>{nasowite.socials.linkedin}</span>
-                  </a>
+                  {nasowite.socials.instagram && (
+                    <a
+                      href={`https://instagram.com/${nasowite.socials.instagram.replace('@', '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors"
+                    >
+                      <Instagram className="w-5 h-5" />
+                      <span>{nasowite.socials.instagram}</span>
+                    </a>
+                  )}
+                  {nasowite.socials.twitter && (
+                    <a
+                      href={`https://twitter.com/${nasowite.socials.twitter.replace('@', '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors"
+                    >
+                      <Twitter className="w-5 h-5" />
+                      <span>{nasowite.socials.twitter}</span>
+                    </a>
+                  )}
+                  {nasowite.socials.linkedin && (
+                    <a
+                      href={`https://linkedin.com/in/${nasowite.socials.linkedin}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors"
+                    >
+                      <Linkedin className="w-5 h-5" />
+                      <span>{nasowite.socials.linkedin}</span>
+                    </a>
+                  )}
                   <a
                     href={`mailto:${nasowite.socials.email}`}
                     className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors"
@@ -116,18 +162,28 @@ const NasowiteOfWeek = () => {
                     <Mail className="w-5 h-5" />
                     <span>{nasowite.socials.email}</span>
                   </a>
-                  <a
-                    href={`tel:${nasowite.socials.phone}`}
-                    className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors"
-                  >
-                    <Phone className="w-5 h-5" />
-                    <span>{nasowite.socials.phone}</span>
-                  </a>
+                  {nasowite.socials.phone && (
+                    <a
+                      href={`tel:${nasowite.socials.phone}`}
+                      className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors"
+                    >
+                      <Phone className="w-5 h-5" />
+                      <span>{nasowite.socials.phone}</span>
+                    </a>
+                  )}
                 </div>
               </div>
+
+              <Link
+                href="/nasowite-of-the-week"
+                className="inline-block text-center bg-[#9179E0] text-white px-6 py-3 rounded-xl hover:bg-[#7d64c9] transition-colors font-semibold"
+              >
+                View All Honorees
+              </Link>
             </div>
           </div>
         </div>
+
         <div className="lg:hidden max-w-md mx-auto perspective">
           <div
             className="relative w-full h-[500px] cursor-pointer"
@@ -212,27 +268,39 @@ const NasowiteOfWeek = () => {
                       Connect
                     </h4>
                     <div className="space-y-3">
-                      <a
-                        href={`https://instagram.com/${nasowite.socials.instagram.replace('@', '')}`}
-                        className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#9179E0] transition-colors"
-                      >
-                        <Instagram className="w-4 h-4 flex-shrink-0" />
-                        <span className="truncate">{nasowite.socials.instagram}</span>
-                      </a>
-                      <a
-                        href={`https://twitter.com/${nasowite.socials.twitter.replace('@', '')}`}
-                        className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#9179E0] transition-colors"
-                      >
-                        <Twitter className="w-4 h-4 flex-shrink-0" />
-                        <span className="truncate">{nasowite.socials.twitter}</span>
-                      </a>
-                      <a
-                        href={`https://linkedin.com/in/${nasowite.socials.linkedin}`}
-                        className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#9179E0] transition-colors"
-                      >
-                        <Linkedin className="w-4 h-4 flex-shrink-0" />
-                        <span className="truncate">{nasowite.socials.linkedin}</span>
-                      </a>
+                      {nasowite.socials.instagram && (
+                        <a
+                          href={`https://instagram.com/${nasowite.socials.instagram.replace('@', '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#9179E0] transition-colors"
+                        >
+                          <Instagram className="w-4 h-4 flex-shrink-0" />
+                          <span className="truncate">{nasowite.socials.instagram}</span>
+                        </a>
+                      )}
+                      {nasowite.socials.twitter && (
+                        <a
+                          href={`https://twitter.com/${nasowite.socials.twitter.replace('@', '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#9179E0] transition-colors"
+                        >
+                          <Twitter className="w-4 h-4 flex-shrink-0" />
+                          <span className="truncate">{nasowite.socials.twitter}</span>
+                        </a>
+                      )}
+                      {nasowite.socials.linkedin && (
+                        <a
+                          href={`https://linkedin.com/in/${nasowite.socials.linkedin}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#9179E0] transition-colors"
+                        >
+                          <Linkedin className="w-4 h-4 flex-shrink-0" />
+                          <span className="truncate">{nasowite.socials.linkedin}</span>
+                        </a>
+                      )}
                       <a
                         href={`mailto:${nasowite.socials.email}`}
                         className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#9179E0] transition-colors"
@@ -240,15 +308,24 @@ const NasowiteOfWeek = () => {
                         <Mail className="w-4 h-4 flex-shrink-0" />
                         <span className="truncate">{nasowite.socials.email}</span>
                       </a>
-                      <a
-                        href={`tel:${nasowite.socials.phone}`}
-                        className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#9179E0] transition-colors"
-                      >
-                        <Phone className="w-4 h-4 flex-shrink-0" />
-                        <span className="truncate">{nasowite.socials.phone}</span>
-                      </a>
+                      {nasowite.socials.phone && (
+                        <a
+                          href={`tel:${nasowite.socials.phone}`}
+                          className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#9179E0] transition-colors"
+                        >
+                          <Phone className="w-4 h-4 flex-shrink-0" />
+                          <span className="truncate">{nasowite.socials.phone}</span>
+                        </a>
+                      )}
                     </div>
                   </div>
+
+                  <Link
+                    href="/nasowite-of-the-week"
+                    className="block text-center bg-[#9179E0] text-white px-6 py-3 rounded-xl hover:bg-[#7d64c9] transition-colors font-semibold text-sm"
+                  >
+                    View All Honorees
+                  </Link>
                 </div>
               </div>
             </div>
