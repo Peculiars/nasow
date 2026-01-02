@@ -146,9 +146,9 @@ export default function ExecutivesPage() {
                       >
                         <Phone className="w-4 h-4" />
                       </Link>
-                      {exec.socialMedia.instagram && (
+                      {exec?.socialMedia?.instagram && (
                         <Link
-                          href={`https://instagram.com/${exec.socialMedia.instagram.replace('@', '')}`}
+                          href={`https://instagram.com/${exec?.socialMedia?.instagram.replace('@', '')}`}
                           target="_blank"
                           className="w-9 h-9 bg-gray-800 text-white hover:bg-[#9179E0] rounded-lg flex items-center justify-center transition-colors"
                           onClick={(e) => e.stopPropagation()}
@@ -156,9 +156,9 @@ export default function ExecutivesPage() {
                           <Instagram className="w-4 h-4" />
                         </Link>
                       )}
-                      {exec.socialMedia.linkedin && (
+                      {exec?.socialMedia?.linkedin && (
                         <Link
-                          href={`https://linkedin.com/in/${exec.socialMedia.linkedin}`}
+                          href={`https://linkedin.com/in/${exec?.socialMedia?.linkedin}`}
                           target="_blank"
                           className="w-9 h-9 bg-gray-800 text-white hover:bg-[#9179E0] rounded-lg flex items-center justify-center transition-colors"
                           onClick={(e) => e.stopPropagation()}
@@ -166,9 +166,9 @@ export default function ExecutivesPage() {
                           <Linkedin className="w-4 h-4" />
                         </Link>
                       )}
-                      {exec.socialMedia.twitter && (
+                      {exec?.socialMedia?.twitter && (
                         <Link
-                          href={`https://twitter.com/${exec.socialMedia.twitter.replace('@', '')}`}
+                          href={`https://twitter.com/${exec?.socialMedia?.twitter.replace('@', '')}`}
                           target="_blank"
                           className="w-9 h-9 bg-gray-800 text-white hover:bg-[#9179E0] rounded-lg flex items-center justify-center transition-colors"
                           onClick={(e) => e.stopPropagation()}
@@ -176,9 +176,9 @@ export default function ExecutivesPage() {
                           <Twitter className="w-4 h-4" />
                         </Link>
                       )}
-                      {exec.socialMedia.facebook && (
+                      {exec?.socialMedia?.facebook && (
                         <Link
-                          href={`https://facebook.com/${exec.socialMedia.facebook}`}
+                          href={`https://facebook.com/${exec?.socialMedia?.facebook}`}
                           target="_blank"
                           className="w-9 h-9 bg-gray-800 text-white hover:bg-[#9179E0] rounded-lg flex items-center justify-center transition-colors"
                           onClick={(e) => e.stopPropagation()}
@@ -335,22 +335,22 @@ export default function ExecutivesPage() {
                       <Phone className="w-5 h-5" />
                       <span>{selectedExec.phone}</span>
                     </a>
-                    {selectedExec.socialMedia.instagram && (
-                      <a href={`https://instagram.com/${selectedExec.socialMedia.instagram.replace('@', '')}`} target="_blank" className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors">
+                    {selectedExec?.socialMedia?.instagram && (
+                      <a href={`https://instagram.com/${selectedExec?.socialMedia?.instagram.replace('@', '')}`} target="_blank" className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors">
                         <Instagram className="w-5 h-5" />
-                        <span>{selectedExec.socialMedia.instagram}</span>
+                        <span>{selectedExec?.socialMedia?.instagram}</span>
                       </a>
                     )}
-                    {selectedExec.socialMedia.linkedin && (
-                      <a href={`https://linkedin.com/in/${selectedExec.socialMedia.linkedin}`} target="_blank" className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors">
+                    {selectedExec?.socialMedia?.linkedin && (
+                      <a href={`https://linkedin.com/in/${selectedExec?.socialMedia?.linkedin}`} target="_blank" className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors">
                         <Linkedin className="w-5 h-5" />
-                        <span>{selectedExec.socialMedia.linkedin}</span>
+                        <span>{selectedExec?.socialMedia?.linkedin}</span>
                       </a>
                     )}
-                    {selectedExec.socialMedia.twitter && (
-                      <a href={`https://twitter.com/${selectedExec.socialMedia.twitter.replace('@', '')}`} target="_blank" className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors">
+                    {selectedExec?.socialMedia?.twitter && (
+                      <a href={`https://twitter.com/${selectedExec?.socialMedia?.twitter.replace('@', '')}`} target="_blank" className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors">
                         <Twitter className="w-5 h-5" />
-                        <span>{selectedExec.socialMedia.twitter}</span>
+                        <span>{selectedExec?.socialMedia?.twitter}</span>
                       </a>
                     )}
                   </div>

@@ -151,9 +151,9 @@ export default function IconsPage() {
                       >
                         <Phone className="w-4 h-4" />
                       </Link>
-                      {icon.socialMedia.instagram && (
+                      {icon?.socialMedia?.instagram && (
                         <Link
-                          href={`https://instagram.com/${icon.socialMedia.instagram.replace('@', '')}`}
+                          href={`https://instagram.com/${icon?.socialMedia?.instagram.replace('@', '')}`}
                           target="_blank"
                           className="w-9 h-9 bg-gray-800 text-white hover:bg-[#9179E0] rounded-lg flex items-center justify-center transition-colors"
                           onClick={(e) => e.stopPropagation()}
@@ -161,9 +161,9 @@ export default function IconsPage() {
                           <Instagram className="w-4 h-4" />
                         </Link>
                       )}
-                      {icon.socialMedia.linkedin && (
+                      {icon?.socialMedia?.linkedin && (
                         <Link
-                          href={`https://linkedin.com/in/${icon.socialMedia.linkedin}`}
+                          href={`https://linkedin.com/in/${icon?.socialMedia?.linkedin}`}
                           target="_blank"
                           className="w-9 h-9 bg-gray-800 text-white hover:bg-[#9179E0] rounded-lg flex items-center justify-center transition-colors"
                           onClick={(e) => e.stopPropagation()}
@@ -171,9 +171,9 @@ export default function IconsPage() {
                           <Linkedin className="w-4 h-4" />
                         </Link>
                       )}
-                      {icon.socialMedia.twitter && (
+                      {icon?.socialMedia?.twitter && (
                         <Link
-                          href={`https://twitter.com/${icon.socialMedia.twitter.replace('@', '')}`}
+                          href={`https://twitter.com/${icon?.socialMedia?.twitter.replace('@', '')}`}
                           target="_blank"
                           className="w-9 h-9 bg-gray-800 text-white hover:bg-[#9179E0] rounded-lg flex items-center justify-center transition-colors"
                           onClick={(e) => e.stopPropagation()}
@@ -328,22 +328,22 @@ export default function IconsPage() {
                       <Phone className="w-5 h-5" />
                       <span>{selectedIcon.phone}</span>
                     </Link>
-                    {selectedIcon.socialMedia.instagram && (
-                      <Link href={`https://instagram.com/${selectedIcon.socialMedia.instagram.replace('@', '')}`} target="_blank" className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors">
+                    {selectedIcon?.socialMedia?.instagram && (
+                      <Link href={`https://instagram.com/${selectedIcon?.socialMedia?.instagram.replace('@', '')}`} target="_blank" className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors">
                         <Instagram className="w-5 h-5" />
-                        <span>{selectedIcon.socialMedia.instagram}</span>
+                        <span>{selectedIcon?.socialMedia?.instagram}</span>
                       </Link>
                     )}
-                    {selectedIcon.socialMedia.linkedin && (
-                      <Link href={`https://linkedin.com/in/${selectedIcon.socialMedia.linkedin}`} target="_blank" className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors">
+                    {selectedIcon?.socialMedia?.linkedin && (
+                      <Link href={`https://linkedin.com/in/${selectedIcon?.socialMedia?.linkedin}`} target="_blank" className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors">
                         <Linkedin className="w-5 h-5" />
-                        <span>{selectedIcon.socialMedia.linkedin}</span>
+                        <span>{selectedIcon?.socialMedia?.linkedin}</span>
                       </Link>
                     )}
-                    {selectedIcon.socialMedia.twitter && (
-                      <Link href={`https://twitter.com/${selectedIcon.socialMedia.twitter.replace('@', '')}`} target="_blank" className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors">
+                    {selectedIcon?.socialMedia?.twitter && (
+                      <Link href={`https://twitter.com/${selectedIcon?.socialMedia?.twitter.replace('@', '')}`} target="_blank" className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors">
                         <Twitter className="w-5 h-5" />
-                        <span>{selectedIcon.socialMedia.twitter}</span>
+                        <span>{selectedIcon?.socialMedia?.twitter}</span>
                       </Link>
                     )}
                   </div>

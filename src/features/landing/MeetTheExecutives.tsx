@@ -117,9 +117,9 @@ const MeetTheExecutives = () => {
                           <Phone className="w-5 h-5 text-white" />
                         </Link>
 
-                        {exec.socialMedia.instagram && (
+                        {exec?.socialMedia?.instagram && (
                           <Link
-                            href={`https://instagram.com/${exec.socialMedia.instagram.replace(
+                            href={`https://instagram.com/${exec?.socialMedia?.instagram.replace(
                               "@",
                               ""
                             )}`}
@@ -131,9 +131,9 @@ const MeetTheExecutives = () => {
                           </Link>
                         )}
 
-                        {exec.socialMedia.linkedin && (
+                        {exec?.socialMedia?.linkedin && (
                           <Link
-                            href={`https://linkedin.com/in/${exec.socialMedia.linkedin}`}
+                            href={`https://linkedin.com/in/${exec?.socialMedia?.linkedin}`}
                             target="_blank"
                             onClick={(e) => e.stopPropagation()}
                             className="w-10 h-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center"
