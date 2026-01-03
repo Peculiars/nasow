@@ -1,118 +1,127 @@
 "use client"
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, RotateCcw, BookOpen, CheckCircle, XCircle, Sparkles, TrendingUp, Clock, Brain, Award, Zap, Filter, Star, Bookmark, BookmarkCheck } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, BookOpen, CheckCircle, XCircle, Brain, Award, Clock, Star, Bookmark, BookmarkCheck, Zap } from "lucide-react";
 
-const flashcardsData = [
-  {
-    id: 1,
-    category: "Social Work Theory",
-    question: "What is the Systems Theory in Social Work?",
-    answer: "Systems Theory views individuals as part of interconnected systems (family, community, society). It emphasizes understanding how these systems interact and influence behavior, focusing on relationships rather than isolated individuals.",
-    difficulty: "Medium",
-    keyPoints: ["Interconnected systems", "Family & community focus", "Relationships over isolation"],
-    relatedTopics: ["Ecological Theory", "Family Systems"],
-    explanation: "This theory is crucial for understanding how different life contexts affect individuals and how interventions can target multiple system levels."
-  },
-  {
-    id: 2,
-    category: "Social Work Ethics",
-    question: "What are the core values of social work?",
-    answer: "Service, Social Justice, Dignity and Worth of the Person, Importance of Human Relationships, Integrity, and Competence. These guide ethical decision-making and professional conduct.",
-    difficulty: "Easy",
-    keyPoints: ["Service to others", "Social justice advocacy", "Dignity & integrity"],
-    relatedTopics: ["NASW Code of Ethics", "Professional Standards"],
-    explanation: "These six core values form the foundation of all social work practice and are tested in licensing exams."
-  },
-  {
-    id: 3,
-    category: "Community Practice",
-    question: "Define Community Organizing",
-    answer: "Community organizing is a process where people who live in proximity come together to act in their shared self-interest, building power to create social change and address community issues collectively.",
-    difficulty: "Medium",
-    keyPoints: ["Collective action", "Shared interests", "Social change focus"],
-    relatedTopics: ["Advocacy", "Empowerment Theory"],
-    explanation: "Key for macro practice exams. Remember: it's about building collective power, not individual case management."
-  },
-  {
-    id: 4,
-    category: "Clinical Practice",
-    question: "What is Person-Centered Therapy?",
-    answer: "Developed by Carl Rogers, it emphasizes the client's capacity for self-direction and understanding their own development. Core conditions include empathy, unconditional positive regard, and congruence.",
-    difficulty: "Hard",
-    keyPoints: ["Client self-direction", "Empathy & regard", "Carl Rogers approach"],
-    relatedTopics: ["Humanistic Psychology", "Therapeutic Relationships"],
-    explanation: "Remember the 3 core conditions: empathy, unconditional positive regard, and congruence. Often tested in clinical exams."
-  },
-  {
-    id: 5,
-    category: "Research Methods",
-    question: "Difference between Qualitative and Quantitative Research?",
-    answer: "Qualitative explores meanings, experiences, and perspectives through interviews and observations. Quantitative measures variables numerically through surveys and experiments, focusing on statistical analysis.",
-    difficulty: "Medium",
-    keyPoints: ["Qualitative: meanings & experiences", "Quantitative: numerical data", "Different methods"],
-    relatedTopics: ["Data Analysis", "Research Design"],
-    explanation: "Quick tip: Qualitative = Quality (depth), Quantitative = Quantity (numbers). Know which methods go with each type."
-  }
-];
+// Types
+interface Flashcard {
+  _id: string;
+  category: string;
+  question: string;
+  answer: string;
+  difficulty: "Easy" | "Medium" | "Hard";
+  level: "100L" | "200L" | "300L" | "400L" | "500L" | "General";
+  keyPoints: string[];
+  relatedTopics: string[];
+  explanation: string;
+}
+
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}
+
+type ActionType = "view" | "mastered" | "review";
 
 const StudyFlashcards = () => {
-  const [currentCard, setCurrentCard] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [masteredCards, setMasteredCards] = useState<number[]>([]);
-  const [reviewCards, setReviewCards] = useState<number[]>([]);
-  const [bookmarkedCards, setBookmarkedCards] = useState<number[]>([]);
-  const [sessionStartTime] = useState(Date.now());
-  const [studyStreak, setStudyStreak] = useState(0);
+  const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [currentCard, setCurrentCard] = useState<number>(0);
+  const [isFlipped, setIsFlipped] = useState<boolean>(false);
+  const [masteredCards, setMasteredCards] = useState<string[]>([]);
+  const [reviewCards, setReviewCards] = useState<string[]>([]);
+  const [bookmarkedCards, setBookmarkedCards] = useState<string[]>([]);
+  const [sessionStartTime] = useState<number>(Date.now());
+  const [filterLevel, setFilterLevel] = useState<string>("All");
   const [filterDifficulty, setFilterDifficulty] = useState<string>("All");
-  const [showExplanation, setShowExplanation] = useState(false);
+  const [stats, setStats] = useState<{ total: number }>({ total: 0 });
 
   useEffect(() => {
-    if (masteredCards.length > 0 && masteredCards.length % 3 === 0) {
-      setStudyStreak(prev => prev + 1);
-    }
-  }, [masteredCards]);
+    fetchFlashcards();
+  }, [filterLevel, filterDifficulty]);
 
-  const handleFlip = () => {
+  const fetchFlashcards = async (): Promise<void> => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (filterLevel !== "All") params.append("level", filterLevel);
+      if (filterDifficulty !== "All") params.append("difficulty", filterDifficulty);
+
+      const response = await fetch(`/api/flashcards?${params}`);
+      const data: ApiResponse<Flashcard[]> = await response.json();
+      
+      if (data.success && data.data && data.data.length > 0) {
+        setFlashcards(data.data);
+        setCurrentCard(0);
+        setStats({ total: data.data.length });
+      } else {
+        setFlashcards([]);
+        setStats({ total: 0 });
+      }
+    } catch (error) {
+      console.error("Error fetching flashcards:", error);
+      setFlashcards([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const trackAction = async (cardId: string, action: ActionType): Promise<void> => {
+    try {
+      await fetch(`/api/flashcards/${cardId}/track`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action })
+      });
+    } catch (error) {
+      console.error("Error tracking action:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (flashcards.length > 0 && flashcards[currentCard]) {
+      trackAction(flashcards[currentCard]._id, "view");
+    }
+  }, [currentCard, flashcards]);
+
+  const handleFlip = (): void => {
     setIsFlipped(!isFlipped);
-    if (!isFlipped) {
-      setShowExplanation(false);
-    }
   };
 
-  const handleNext = () => {
+  const handleNext = (): void => {
     setIsFlipped(false);
-    setShowExplanation(false);
     setTimeout(() => {
-      setCurrentCard((prev) => (prev + 1) % flashcardsData.length);
+      setCurrentCard((prev) => (prev + 1) % flashcards.length);
     }, 200);
   };
 
-  const handlePrevious = () => {
+  const handlePrevious = (): void => {
     setIsFlipped(false);
-    setShowExplanation(false);
     setTimeout(() => {
-      setCurrentCard((prev) => (prev - 1 + flashcardsData.length) % flashcardsData.length);
+      setCurrentCard((prev) => (prev - 1 + flashcards.length) % flashcards.length);
     }, 200);
   };
 
-  const handleMastered = () => {
-    const cardId = flashcardsData[currentCard].id;
+  const handleMastered = (): void => {
+    const cardId = flashcards[currentCard]._id;
     if (!masteredCards.includes(cardId)) {
       setMasteredCards([...masteredCards, cardId]);
+      trackAction(cardId, "mastered");
     }
     handleNext();
   };
 
-  const handleReview = () => {
-    const cardId = flashcardsData[currentCard].id;
+  const handleReview = (): void => {
+    const cardId = flashcards[currentCard]._id;
     if (!reviewCards.includes(cardId)) {
       setReviewCards([...reviewCards, cardId]);
+      trackAction(cardId, "review");
     }
     handleNext();
   };
 
-  const toggleBookmark = () => {
-    const cardId = flashcardsData[currentCard].id;
+  const toggleBookmark = (): void => {
+    const cardId = flashcards[currentCard]._id;
     if (bookmarkedCards.includes(cardId)) {
       setBookmarkedCards(bookmarkedCards.filter(id => id !== cardId));
     } else {
@@ -120,24 +129,22 @@ const StudyFlashcards = () => {
     }
   };
 
-  const handleReset = () => {
+  const handleReset = (): void => {
     setCurrentCard(0);
     setIsFlipped(false);
     setMasteredCards([]);
     setReviewCards([]);
-    setStudyStreak(0);
-    setShowExplanation(false);
+    setFilterLevel("All");
+    setFilterDifficulty("All");
   };
 
-  const progress = ((currentCard + 1) / flashcardsData.length) * 100;
+  const progress = flashcards.length > 0 ? ((currentCard + 1) / flashcards.length) * 100 : 0;
   const studyTime = Math.floor((Date.now() - sessionStartTime) / 60000);
   const accuracyRate = masteredCards.length + reviewCards.length > 0 
     ? Math.round((masteredCards.length / (masteredCards.length + reviewCards.length)) * 100)
     : 0;
 
-  const isBookmarked = bookmarkedCards.includes(flashcardsData[currentCard].id);
-
-  const getDifficultyColor = (difficulty:any) => {
+  const getDifficultyColor = (difficulty: string): string => {
     switch(difficulty) {
       case "Easy": return "bg-green-100 text-green-700 border-green-300";
       case "Medium": return "bg-yellow-100 text-yellow-700 border-yellow-300";
@@ -146,10 +153,41 @@ const StudyFlashcards = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <section className="min-h-screen bg-gray-50 py-20 font-inter flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block w-16 h-16 border-4 border-[#9179E0] border-t-transparent rounded-full animate-spin"></div>
+          <p className="mt-4 text-gray-600 font-medium">Loading flashcards...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (flashcards.length === 0) {
+    return (
+      <section className="min-h-screen bg-gray-50 py-20 font-inter">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <BookOpen className="w-24 h-24 text-gray-400 mx-auto mb-6" />
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">No Flashcards Available</h2>
+          <p className="text-gray-600 mb-8">There are no flashcards matching your current filters. Try adjusting your selection.</p>
+          <button
+            onClick={() => { setFilterLevel("All"); setFilterDifficulty("All"); }}
+            className="px-8 py-4 bg-[#9179E0] text-white rounded-xl font-bold hover:bg-[#7E6BDB] transition-colors"
+          >
+            Reset Filters
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  const currentFlashcard = flashcards[currentCard];
+  const isBookmarked = bookmarkedCards.includes(currentFlashcard._id);
+
   return (
     <section className="min-h-screen bg-gray-50 py-12 md:py-20 font-inter">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="text-center mb-8 md:mb-12">
           <div className="inline-flex items-center gap-2 bg-[#9179E0]/10 border-2 border-[#9179E0]/30 px-5 py-2.5 rounded-xl mb-5">
             <Brain className="w-5 h-5 text-[#9179E0]" />
@@ -162,8 +200,25 @@ const StudyFlashcards = () => {
             Comprehensive study materials to help you ace your exams with confidence
           </p>
 
-          {/* Filter Buttons */}
+          <div className="flex items-center justify-center gap-3 flex-wrap mb-4">
+            <span className="text-sm font-bold text-gray-700">Level:</span>
+            {["All", "100L", "200L", "300L", "400L", "500L", "General"].map((level) => (
+              <button
+                key={level}
+                onClick={() => setFilterLevel(level)}
+                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all border-2 ${
+                  filterLevel === level
+                    ? "bg-[#9179E0] text-white border-[#9179E0] shadow-lg"
+                    : "bg-white text-gray-700 border-gray-300 hover:border-[#9179E0]/50"
+                }`}
+              >
+                {level}
+              </button>
+            ))}
+          </div>
+
           <div className="flex items-center justify-center gap-3 flex-wrap">
+            <span className="text-sm font-bold text-gray-700">Difficulty:</span>
             {["All", "Easy", "Medium", "Hard"].map((filter) => (
               <button
                 key={filter}
@@ -180,7 +235,6 @@ const StudyFlashcards = () => {
           </div>
         </div>
 
-        {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
           <div className="bg-white rounded-2xl p-5 shadow-md border-2 border-gray-200 hover:border-[#9179E0]/50 transition-all">
             <div className="flex items-center justify-between mb-3">
@@ -188,7 +242,7 @@ const StudyFlashcards = () => {
                 <BookOpen className="w-6 h-6 text-[#9179E0]" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-gray-900 mb-1">{currentCard + 1}/{flashcardsData.length}</p>
+            <p className="text-3xl font-bold text-gray-900 mb-1">{currentCard + 1}/{flashcards.length}</p>
             <p className="text-sm text-gray-600 font-medium">Progress</p>
           </div>
 
@@ -233,7 +287,6 @@ const StudyFlashcards = () => {
           </div>
         </div>
 
-        {/* Progress Bar */}
         <div className="mb-10">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
@@ -253,7 +306,6 @@ const StudyFlashcards = () => {
           </div>
         </div>
 
-        {/* Flashcard */}
         <div className="relative mb-10" style={{ perspective: "1500px" }}>
           <div
             className="relative w-full min-h-[500px] md:min-h-[600px] cursor-pointer transition-all duration-700"
@@ -263,7 +315,6 @@ const StudyFlashcards = () => {
             }}
             onClick={handleFlip}
           >
-            {/* Front - Question */}
             <div
               className="absolute inset-0 w-full bg-white rounded-3xl shadow-xl border-4 border-gray-200 p-8 md:p-12"
               style={{ 
@@ -273,14 +324,16 @@ const StudyFlashcards = () => {
             >
               <div className="flex flex-col h-full justify-between min-h-[450px]">
                 <div>
-                  {/* Header with Bookmark */}
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="px-4 py-2 bg-[#9179E0]/10 text-[#9179E0] text-sm font-bold rounded-xl border-2 border-[#9179E0]/30">
-                        {flashcardsData[currentCard].category}
+                        {currentFlashcard.category}
                       </span>
-                      <span className={`px-4 py-2 text-sm font-bold rounded-xl border-2 ${getDifficultyColor(flashcardsData[currentCard].difficulty)}`}>
-                        {flashcardsData[currentCard].difficulty}
+                      <span className={`px-4 py-2 text-sm font-bold rounded-xl border-2 ${getDifficultyColor(currentFlashcard.difficulty)}`}>
+                        {currentFlashcard.difficulty}
+                      </span>
+                      <span className="px-4 py-2 bg-blue-100 text-blue-700 text-sm font-bold rounded-xl border-2 border-blue-300">
+                        {currentFlashcard.level}
                       </span>
                     </div>
                     <button
@@ -298,27 +351,25 @@ const StudyFlashcards = () => {
                     </button>
                   </div>
                   
-                  {/* Question */}
                   <div className="mb-8">
                     <div className="flex items-center gap-2 mb-4">
                       <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Question</span>
                       <span className="text-xs text-gray-400 font-semibold">
-                        ({currentCard + 1}/{flashcardsData.length})
+                        ({currentCard + 1}/{flashcards.length})
                       </span>
                     </div>
                     <h3 className="text-2xl md:text-4xl font-bold text-gray-900 leading-tight">
-                      {flashcardsData[currentCard].question}
+                      {currentFlashcard.question}
                     </h3>
                   </div>
 
-                  {/* Key Points */}
                   <div className="bg-blue-50 rounded-2xl p-6 border-2 border-blue-200">
                     <p className="text-xs font-bold text-blue-700 uppercase tracking-wide mb-4 flex items-center gap-2">
                       <Zap className="w-4 h-4" />
                       Key Points to Remember
                     </p>
                     <ul className="space-y-3">
-                      {flashcardsData[currentCard].keyPoints.map((point, index) => (
+                      {currentFlashcard.keyPoints.map((point, index) => (
                         <li key={index} className="flex items-start gap-3 text-sm font-medium text-gray-700">
                           <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
                             {index + 1}
@@ -330,7 +381,6 @@ const StudyFlashcards = () => {
                   </div>
                 </div>
                 
-                {/* Flip Prompt */}
                 <div className="text-center pt-6 border-t-2 border-dashed border-gray-300">
                   <div className="inline-flex items-center gap-3 px-6 py-3 bg-[#9179E0]/10 rounded-xl border-2 border-[#9179E0]/30">
                     <RotateCcw className="w-5 h-5 text-[#9179E0]" />
@@ -340,7 +390,6 @@ const StudyFlashcards = () => {
               </div>
             </div>
 
-            {/* Back - Answer */}
             <div
               className="absolute inset-0 w-full bg-[#4a368f] rounded-3xl shadow-xl border-4 border-[#9179E0] p-8 md:p-12"
               style={{
@@ -351,41 +400,37 @@ const StudyFlashcards = () => {
             >
               <div className="flex flex-col h-full justify-between min-h-[450px]">
                 <div>
-                  {/* Header */}
                   <div className="flex items-center gap-3 mb-6">
                     <span className="px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-xl border-2 border-white/40">
                       Answer
                     </span>
                     <span className="px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-xl border-2 border-white/40">
-                      {flashcardsData[currentCard].category}
+                      {currentFlashcard.category}
                     </span>
                   </div>
                   
-                  {/* Answer */}
                   <div className="mb-6">
                     <p className="text-xl md:text-3xl text-white leading-relaxed font-medium mb-6">
-                      {flashcardsData[currentCard].answer}
+                      {currentFlashcard.answer}
                     </p>
                   </div>
 
-                  {/* Exam Tip */}
                   <div className="bg-white/10 rounded-2xl p-6 border-2 border-white/30 mb-6">
                     <p className="text-xs font-bold text-white uppercase tracking-wide mb-3 flex items-center gap-2">
                       <Award className="w-4 h-4" />
                       Exam Tip
                     </p>
                     <p className="text-white/90 text-sm leading-relaxed">
-                      {flashcardsData[currentCard].explanation}
+                      {currentFlashcard.explanation}
                     </p>
                   </div>
 
-                  {/* Related Topics */}
                   <div className="bg-white/10 rounded-2xl p-6 border-2 border-white/30">
                     <p className="text-xs font-bold text-white uppercase tracking-wide mb-3">
                       Related Topics for Further Study:
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {flashcardsData[currentCard].relatedTopics.map((topic, index) => (
+                      {currentFlashcard.relatedTopics.map((topic, index) => (
                         <span key={index} className="px-4 py-2 bg-white/20 text-white text-sm font-semibold rounded-lg border border-white/30">
                           {topic}
                         </span>
@@ -394,7 +439,6 @@ const StudyFlashcards = () => {
                   </div>
                 </div>
                 
-                {/* Flip Back */}
                 <div className="text-center pt-6 border-t-2 border-dashed border-white/30">
                   <p className="text-sm font-bold text-white/90">Click to return to question</p>
                 </div>
@@ -403,7 +447,6 @@ const StudyFlashcards = () => {
           </div>
         </div>
 
-        {/* Navigation */}
         <div className="flex items-center justify-center gap-4 mb-8">
           <button
             onClick={handlePrevious}
@@ -419,12 +462,12 @@ const StudyFlashcards = () => {
             className="flex items-center gap-2 px-6 py-4 bg-gray-100 rounded-xl border-2 border-gray-300 hover:bg-gray-200 transition-all duration-300"
           >
             <RotateCcw className="w-5 h-5 text-gray-600" />
-            <span className="font-bold text-gray-600">Reset All</span>
+            <span className="font-bold text-gray-600">Reset</span>
           </button>
 
           <button
             onClick={handleNext}
-            disabled={currentCard === flashcardsData.length - 1}
+            disabled={currentCard === flashcards.length - 1}
             className="flex items-center gap-2 px-6 py-4 bg-white rounded-xl shadow-md border-2 border-gray-300 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#9179E0] hover:shadow-lg"
           >
             <span className="font-bold text-gray-700">Next</span>
@@ -432,7 +475,6 @@ const StudyFlashcards = () => {
           </button>
         </div>
 
-        {/* Action Buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto mb-10">
           <button
             onClick={handleReview}
@@ -451,34 +493,7 @@ const StudyFlashcards = () => {
           </button>
         </div>
 
-        {/* Study Tips */}
-        <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200 max-w-4xl mx-auto">
-          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-[#9179E0]" />
-            Study Tips for Success
-          </h3>
-          <ul className="space-y-3 text-gray-700">
-            <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-              <span>Review "Need Review" cards multiple times before exams</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-              <span>Use bookmarks to mark challenging concepts for focused study</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-              <span>Study related topics together for better understanding</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-              <span>Aim for 90%+ accuracy rate before taking your exam</span>
-            </li>
-          </ul>
-        </div>
-
-        {/* Completion */}
-        {currentCard === flashcardsData.length - 1 && (
+        {currentCard === flashcards.length - 1 && (
           <div className="mt-12 text-center p-10 bg-white rounded-3xl shadow-xl border-4 border-[#9179E0]">
             <div className="w-20 h-20 bg-[#9179E0]/10 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-[#9179E0]/30">
               <Award className="w-10 h-10 text-[#9179E0]" />

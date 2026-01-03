@@ -2,49 +2,42 @@ import { ArrowRight, Mail, GraduationCap, BookOpen } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-const MeetOurLecturers = () => {
-  const lecturers = [
-    {
-      id: 1,
-      name: "Dr. Adeyinka Oladele",
-      title: "Senior Lecturer",
-      specialization: "Clinical Social Work & Mental Health",
-      qualifications: "PhD, MSc, BSc",
-      image: "/assets/img-car-3.png",
-      email: "a.oladele@unilag.edu.ng",
-      courses: ["SOW 322", "SOW 410"]
-    },
-    {
-      id: 2,
-      name: "Dr. Folake Taiwo",
-      title: "Associate Professor",
-      specialization: "Community Development & Social Policy",
-      qualifications: "PhD, MSc",
-      image:  "/assets/img-car-3.png",
-      email: "f.taiwo@unilag.edu.ng",
-      courses: ["SOW 214", "SOW 320"]
-    },
-    {
-      id: 3,
-      name: "Dr. Chukwudi Eze",
-      title: "Lecturer I",
-      specialization: "Social Work Research & Statistics",
-      qualifications: "PhD, MSc, BSc",
-      image:  "/assets/img-car-3.png",
-      email: "c.eze@unilag.edu.ng",
-      courses: ["SOW 213", "SOW 324"]
-    },
-    {
-      id: 4,
-      name: "Dr. Blessing Okoro",
-      title: "Senior Lecturer",
-      specialization: "Child Welfare & Family Social Work",
-      qualifications: "PhD, MSc",
-      image:  "/assets/img-car-3.png",
-      email: "b.okoro@unilag.edu.ng",
-      courses: ["SOW 212", "SOW 323"]
-    }
-  ];
+async function getLecturers() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/lecturers?status=active`, {
+      cache: 'no-store',
+    });
+
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.slice(0, 4);
+  } catch (error) {
+    console.error('Error fetching lecturers:', error);
+    return [];
+  }
+}
+
+async function getLecturersCount() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/lecturers?status=active`, {
+      cache: 'no-store',
+    });
+
+    if (!res.ok) return 0;
+    const data = await res.json();
+    return data.length;
+  } catch (error) {
+    return 0;
+  }
+}
+
+export default async function MeetOurLecturers() {
+  const lecturers = await getLecturers();
+  const totalLecturers = await getLecturersCount();
+
+  if (lecturers.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-16 md:py-24 bg-gray-50 font-inter w-full">
@@ -60,10 +53,11 @@ const MeetOurLecturers = () => {
             Experienced professionals dedicated to shaping the next generation of social workers
           </p>
         </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {lecturers.map((lecturer) => (
+          {lecturers.map((lecturer:any) => (
             <div
-              key={lecturer.id}
+              key={lecturer._id}
               className="group bg-white rounded-2xl shadow-md border-2 border-gray-100 overflow-hidden hover:shadow-xl hover:border-[#9179E0]/20 transition-all duration-300 hover:-translate-y-2"
             >
               <div className="relative h-64 bg-gray-100 overflow-hidden">
@@ -104,23 +98,24 @@ const MeetOurLecturers = () => {
                   </p>
                 </div>
 
-
-                <div className="flex items-center gap-2 mb-3">
-                  <BookOpen className="w-4 h-4 text-gray-400" />
-                  <div className="flex flex-wrap gap-1.5">
-                    {lecturer.courses.map((course, index) => (
-                      <span
-                        key={index}
-                        className="text-xs font-semibold bg-[#9179E0]/10 text-[#9179E0] px-2 py-1 rounded"
-                      >
-                        {course}
-                      </span>
-                    ))}
+                {lecturer.courses && lecturer.courses.length > 0 && (
+                  <div className="flex items-center gap-2 mb-3">
+                    <BookOpen className="w-4 h-4 text-gray-400" />
+                    <div className="flex flex-wrap gap-1.5">
+                      {lecturer.courses.slice(0, 2).map((course: string, index: number) => (
+                        <span
+                          key={index}
+                          className="text-xs font-semibold bg-[#9179E0]/10 text-[#9179E0] px-2 py-1 rounded"
+                        >
+                          {course}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <Link
-                  href={`/lecturers/${lecturer.id}`}
+                  href={`/lecturers/${lecturer._id}`}
                   className="flex items-center justify-center gap-2 w-full text-gray-700 hover:text-[#9179E0] font-semibold text-sm py-2 transition-colors group/link"
                 >
                   View Profile
@@ -144,7 +139,9 @@ const MeetOurLecturers = () => {
 
         <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 py-10 px-6 bg-white rounded-2xl border-2 border-gray-100">
           <div className="text-center">
-            <p className="text-3xl md:text-4xl font-bold text-[#9179E0] mb-1">20+</p>
+            <p className="text-3xl md:text-4xl font-bold text-[#9179E0] mb-1">
+              {totalLecturers}+
+            </p>
             <p className="text-sm text-gray-600 font-medium">Expert Lecturers</p>
           </div>
           <div className="text-center">
@@ -163,6 +160,4 @@ const MeetOurLecturers = () => {
       </div>
     </section>
   );
-};
-
-export default MeetOurLecturers;
+}

@@ -43,8 +43,8 @@ const navItems = [
     dropdown: [
       { name: "News & Events", url: "/events" },
       { name: "NASOWites of the Week", url: "/nasowite-of-the-week" },
-      { name: "Our Sponsors", url: "/sponsors" },
-      { name: "Photo Gallery", url: "/gallery" },
+      { name: "Our Sponsors", url: "/#sponsors" },
+      // { name: "Photo Gallery", url: "/gallery" },
     ],
   },
   { id: "5", name: "Contact Us", url: "/contact" },

@@ -1,355 +1,495 @@
 "use client"
-import React, { useState, useEffect } from 'react';
-import type { FC, ComponentType, SVGProps } from 'react';
-import { Users, BookOpen, FileText, Calendar, TrendingUp, Award, Activity } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { 
+  Users, BookOpen, Calendar, Award, TrendingUp, AlertCircle,
+  FileText, Star, UserCheck, Clock, ArrowUpRight, ArrowDownRight,
+  PieChart, BarChart3, Activity, ChevronRight, Loader2
+} from 'lucide-react';
+import { LineChart, Line, BarChart, Bar, PieChart as RePieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-type StatId = 'students' | 'courses' | 'quizzes' | 'events';
-
-type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
-
-type Stat = {
-  id: StatId;
-  label: string;
-  icon: IconComponent;
-  color: string;
-  bgLight: string;
-  textColor: string;
-};
-
-const STAT_CARDS: Stat[] = [
-  {
-    id: 'students',
-    label: 'Total Students',
-    icon: Users,
-    color: 'bg-blue-500',
-    bgLight: 'bg-blue-50',
-    textColor: 'text-blue-600'
-  },
-  {
-    id: 'courses',
-    label: 'Active Courses',
-    icon: BookOpen,
-    color: 'bg-purple-500',
-    bgLight: 'bg-purple-50',
-    textColor: 'text-purple-600'
-  },
-  {
-    id: 'quizzes',
-    label: 'Total Quizzes',
-    icon: FileText,
-    color: 'bg-green-500',
-    bgLight: 'bg-green-50',
-    textColor: 'text-green-600'
-  },
-  {
-    id: 'events',
-    label: 'Upcoming Events',
-    icon: Calendar,
-    color: 'bg-orange-500',
-    bgLight: 'bg-orange-50',
-    textColor: 'text-orange-600'
-  }
-];
-
-interface StatCardProps {
-  stat: Stat;
-  value: number;
-  trend: number;
-  isLoading: boolean;
+interface DashboardStats {
+  students: {
+    total: number;
+    active: number;
+    suspended: number;
+    banned: number;
+    growth: number;
+  };
+  courses: {
+    total: number;
+    published: number;
+    drafts: number;
+    totalWeeks: number;
+  };
+  quizzes: {
+    total: number;
+    active: number;
+    completed: number;
+    averageScore: number;
+  };
+  flashcards: {
+    total: number;
+    byLevel: Record<string, number>;
+    totalViews: number;
+    masteredCount: number;
+  };
+  newsEvents: {
+    total: number;
+    news: number;
+    events: number;
+    totalViews: number;
+  };
+  executives: {
+    total: number;
+    active: number;
+    sessions: number;
+  };
+  lecturers: {
+    total: number;
+    activeCourses: number;
+  };
 }
 
-const StatCard: FC<StatCardProps> = ({ stat, value, trend, isLoading }) => {
-  const Icon = stat.icon;
-
-  if (isLoading) {
-    return (
-      <div className="bg-white rounded-2xl p-6 border-2 border-gray-100">
-        <div className="flex items-start justify-between">
-          <div className="flex-1 space-y-3">
-            <div className="h-4 bg-gray-200 rounded animate-pulse w-24" />
-            <div className="h-8 bg-gray-200 rounded animate-pulse w-20" />
-            <div className="h-3 bg-gray-200 rounded animate-pulse w-32" />
-          </div>
-          <div className={`${stat.bgLight} p-3 rounded-xl`}>
-            <div className="w-6 h-6 bg-gray-200 rounded animate-pulse" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-gray-200 transition-all hover:shadow-lg group">
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600 mb-2">{stat.label}</p>
-          <h3 className="text-3xl font-bold text-gray-900 mb-2">{value.toLocaleString()}</h3>
-          <div className="flex items-center gap-1">
-            <TrendingUp className={`w-4 h-4 ${trend >= 0 ? 'text-green-500' : 'text-red-500'}`} />
-            <span className={`text-sm font-semibold ${trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {trend >= 0 ? '+' : ''}{trend}%
-            </span>
-            <span className="text-sm text-gray-500 ml-1">vs last month</span>
-          </div>
-        </div>
-        <div className={`${stat.bgLight} p-3 rounded-xl group-hover:scale-110 transition-transform`}>
-          <Icon className={`w-6 h-6 ${stat.textColor}`} />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-type Activity = {
-  title: string;
-  time: string;
-  color: string;
-};
-
-interface ActivityItemProps {
-  activity?: Activity;
-  isLoading: boolean;
+interface ActivityItem {
+  id: string;
+  type: 'student' | 'course' | 'quiz' | 'event';
+  action: string;
+  user: string;
+  timestamp: string;
 }
 
-const ActivityItem: FC<ActivityItemProps> = ({ activity, isLoading }) => {
-  if (isLoading) {
-    return (
-      <div className="flex items-start gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors">
-        <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse flex-shrink-0" />
-        <div className="flex-1 space-y-2">
-          <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
-          <div className="h-3 bg-gray-200 rounded animate-pulse w-1/2" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!activity) return null;
-
-  return (
-    <div className="flex items-start gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
-      <div className={`w-10 h-10 ${activity.color} rounded-full flex items-center justify-center flex-shrink-0`}>
-        <Activity className="w-5 h-5 text-white" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900 mb-1">{activity.title}</p>
-        <p className="text-xs text-gray-500">{activity.time}</p>
-      </div>
-    </div>
-  );
-};
-
-type QuickAction = {
-  icon: IconComponent;
+interface QuickAction {
   title: string;
   description: string;
-  bgLight: string;
-  textColor: string;
-};
-
-interface QuickActionCardProps {
-  action: QuickAction;
-  isLoading: boolean;
+  icon: any;
+  href: string;
+  color: string;
 }
 
-const QuickActionCard: FC<QuickActionCardProps> = ({ action, isLoading }) => {
-  const Icon = action.icon;
+const COLORS = ['#9179E0', '#4ade80', '#fbbf24', '#f87171', '#60a5fa', '#a78bfa'];
 
-  if (isLoading) {
-    return (
-      <div className="bg-white rounded-xl p-6 border-2 border-gray-100">
-        <div className="space-y-3">
-          <div className="w-12 h-12 bg-gray-200 rounded-xl animate-pulse" />
-          <div className="h-5 bg-gray-200 rounded animate-pulse w-32" />
-          <div className="h-4 bg-gray-200 rounded animate-pulse w-full" />
-        </div>
-      </div>
-    );
-  }
+const AdminDashboard = () => {
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('week');
 
-  return (
-    <button className="bg-white rounded-xl p-6 border-2 border-gray-100 hover:border-purple-200 transition-all hover:shadow-lg text-left group w-full">
-      <div className={`${action.bgLight} w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-        <Icon className={`w-6 h-6 ${action.textColor}`} />
-      </div>
-      <h4 className="text-lg font-semibold text-gray-900 mb-2">{action.title}</h4>
-      <p className="text-sm text-gray-600">{action.description}</p>
-    </button>
-  );
-};
+  useEffect(() => {
+    fetchDashboardData();
+  }, [timeRange]);
 
-const AdminDashboard: FC = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [stats, setStats] = useState<Record<StatId, number>>({
-    students: 0,
-    courses: 0,
-    quizzes: 0,
-    events: 0
-  });
-  const [trends, setTrends] = useState<Record<StatId, number>>({
-    students: 0,
-    courses: 0,
-    quizzes: 0,
-    events: 0
-  });
+  const fetchDashboardData = async () => {
+    setIsLoading(true);
+    try {
+      const [studentsRes, coursesRes, flashcardsRes, newsEventsRes, executivesRes] = await Promise.all([
+        fetch('/api/admin/students/stats'),
+        fetch('/api/admin/courses?limit=1000'),
+        fetch('/api/flashcards/stats'),
+        fetch('/api/news-events?limit=1000'),
+        fetch('/api/admin/executives')
+      ]);
+
+      const studentsData = await studentsRes.json();
+      const coursesData = await coursesRes.json();
+      const flashcardsData = await flashcardsRes.json();
+      const newsEventsData = await newsEventsRes.json();
+      const executivesData = await executivesRes.json();
+
+      const courses = coursesData.data || [];
+      const newsEvents = newsEventsData.data || [];
+      const executives = executivesData.data || [];
+
+      setStats({
+        students: {
+          total: studentsData.data?.totalStudents || 0,
+          active: studentsData.data?.activeStudents || 0,
+          suspended: studentsData.data?.suspendedStudents || 0,
+          banned: studentsData.data?.bannedStudents || 0,
+          growth: 12.5
+        },
+        courses: {
+          total: courses.length,
+          published: courses.filter((c: any) => c.status === 'PUBLISHED').length,
+          drafts: courses.filter((c: any) => c.status === 'DRAFT').length,
+          totalWeeks: courses.reduce((acc: number, c: any) => acc + (c.weeks?.length || 0), 0)
+        },
+        quizzes: {
+          total: 45,
+          active: 32,
+          completed: 1250,
+          averageScore: 78.5
+        },
+        flashcards: {
+          total: flashcardsData.data?.total || 0,
+          byLevel: flashcardsData.data?.byLevel?.reduce((acc: any, item: any) => {
+            acc[item._id] = item.count;
+            return acc;
+          }, {}) || {},
+          totalViews: 5420,
+          masteredCount: 892
+        },
+        newsEvents: {
+          total: newsEvents.length,
+          news: newsEvents.filter((n: any) => n.type === 'news').length,
+          events: newsEvents.filter((n: any) => n.type === 'event').length,
+          totalViews: newsEvents.reduce((acc: number, n: any) => acc + (n.views || 0), 0)
+        },
+        executives: {
+          total: executives.length,
+          active: executives.filter((e: any) => e.isActive).length,
+          sessions: new Set(executives.map((e: any) => e.session)).size
+        },
+        lecturers: {
+          total: 24,
+          activeCourses: courses.length
+        }
+      });
+
+      setActivities([
+        { id: '1', type: 'student', action: 'New student registered', user: 'John Doe', timestamp: '2 minutes ago' },
+        { id: '2', type: 'course', action: 'Course published', user: 'Dr. Smith', timestamp: '15 minutes ago' },
+        { id: '3', type: 'quiz', action: 'Quiz completed', user: 'Jane Smith', timestamp: '1 hour ago' },
+        { id: '4', type: 'event', action: 'Event created', user: 'Admin', timestamp: '2 hours ago' }
+      ]);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const quickActions: QuickAction[] = [
     {
+      title: 'Manage Lecturers',
+      description: 'View and manage lecturer profiles',
       icon: Users,
-      title: 'Add Student',
-      description: 'Register a new student to the platform',
-      bgLight: 'bg-blue-50',
-      textColor: 'text-blue-600'
-    },
-    {
-      icon: BookOpen,
-      title: 'Create Course',
-      description: 'Set up a new course with content',
-      bgLight: 'bg-purple-50',
-      textColor: 'text-purple-600'
-    },
-    {
-      icon: FileText,
-      title: 'New Quiz',
-      description: 'Design a quiz for assessment',
-      bgLight: 'bg-green-50',
-      textColor: 'text-green-600'
-    },
-    {
-      icon: Calendar,
-      title: 'Schedule Event',
-      description: 'Plan an upcoming event or session',
-      bgLight: 'bg-orange-50',
-      textColor: 'text-orange-600'
-    }
-  ];
-
-  const recentActivities: Activity[] = [
-    {
-      title: 'New student registration: John Doe',
-      time: '2 minutes ago',
-      color: 'bg-blue-500'
-    },
-    {
-      title: 'Quiz "React Fundamentals" completed by 45 students',
-      time: '15 minutes ago',
-      color: 'bg-green-500'
-    },
-    {
-      title: 'Course "Advanced JavaScript" updated',
-      time: '1 hour ago',
+      href: '/admin/lecturers',
       color: 'bg-purple-500'
     },
     {
-      title: 'Event "Career Workshop" scheduled for next week',
-      time: '2 hours ago',
-      color: 'bg-orange-500'
+      title: 'Create Course',
+      description: 'Add new course material',
+      icon: BookOpen,
+      href: '/admin/courses/create',
+      color: 'bg-blue-500'
     },
     {
-      title: 'System backup completed successfully',
-      time: '3 hours ago',
-      color: 'bg-gray-500'
+      title: 'Create Quiz',
+      description: 'Design new assessment',
+      icon: FileText,
+      href: '/admin/quizzes',
+      color: 'bg-green-500'
+    },
+    {
+      title: 'Add Event',
+      description: 'Schedule new event',
+      icon: Calendar,
+      href: '/admin/events',
+      color: 'bg-orange-500'
     }
   ];
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+  const studentTrendData = [
+    { name: 'Jan', students: 120 },
+    { name: 'Feb', students: 145 },
+    { name: 'Mar', students: 168 },
+    { name: 'Apr', students: 189 },
+    { name: 'May', students: 205 },
+    { name: 'Jun', students: stats?.students.total || 220 }
+  ];
 
-      setStats({
-        students: 245,
-        courses: 12,
-        quizzes: 38,
-        events: 5
-      });
+  const courseDistributionData = stats ? [
+    { name: 'Published', value: stats.courses.published },
+    { name: 'Drafts', value: stats.courses.drafts }
+  ] : [];
 
-      setTrends({
-        students: 12.5,
-        courses: 8.3,
-        quizzes: -3.2,
-        events: 25.0
-      });
+  const levelDistributionData = stats ? Object.entries(stats.flashcards.byLevel).map(([level, count]) => ({
+    name: level,
+    value: count
+  })) : [];
 
-      setIsLoading(false);
-    };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-[#9179E0] animate-spin" />
+      </div>
+    );
+  }
 
-    void fetchDashboardData();
-  }, []);
+  if (!stats) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
-      <div className="w-full px-6 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard Overview</h1>
-          <p className="text-gray-600">Welcome back! Here's what's happening with your platform today.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {STAT_CARDS.map((stat) => (
-            <StatCard
-              key={stat.id}
-              stat={stat}
-              value={stats[stat.id]}
-              trend={trends[stat.id]}
-              isLoading={isLoading}
-            />
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl border-2 border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Recent Activity</h2>
-                <button className="text-sm font-medium text-purple-600 hover:text-purple-700">View All</button>
-              </div>
-              <div className="space-y-2">
-                {isLoading
-                  ? [...Array(5)].map((_, i) => <ActivityItem key={i} isLoading={true} />)
-                  : recentActivities.map((activity, i) => (
-                      <ActivityItem key={i} activity={activity} isLoading={false} />
-                    ))}
-              </div>
-            </div>
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8 font-inter">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
+            <p className="text-gray-600 mt-1">Welcome back! Here's what's happening today.</p>
           </div>
-
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl border-2 border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Top Performers</h2>
-                <Award className="w-5 h-5 text-yellow-500" />
-              </div>
-              <div className="space-y-4">
-                {isLoading
-                  ? [...Array(5)].map((_, i) => (
-                      <div key={i} className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />
-                        <div className="flex-1 space-y-2">
-                          <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
-                          <div className="h-3 bg-gray-200 rounded animate-pulse w-1/2" />
-                        </div>
-                      </div>
-                    ))
-                  : [...Array(5)].map((_, i) => (
-                      <div key={i} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
-                        <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">{i + 1}</div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">Student Name {i + 1}</p>
-                          <p className="text-xs text-gray-500">{95 - i * 2}% avg score</p>
-                        </div>
-                      </div>
-                    ))}
-              </div>
-            </div>
+          
+          <div className="flex items-center gap-2">
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value as any)}
+              className="px-4 py-2 border-2 border-gray-300 rounded-xl text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-[#9179E0] cursor-pointer"
+            >
+              <option value="week">Last 7 days</option>
+              <option value="month">Last 30 days</option>
+              <option value="year">Last year</option>
+            </select>
           </div>
         </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {quickActions.map((action, i) => (
-              <QuickActionCard key={i} action={action} isLoading={isLoading} />
-            ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-white/20 rounded-xl">
+                <Users className="w-6 h-6" />
+              </div>
+              <div className="flex items-center gap-1 text-sm font-semibold">
+                <TrendingUp className="w-4 h-4" />
+                {stats.students.growth}%
+              </div>
+            </div>
+            <h3 className="text-3xl font-bold mb-1">{stats.students.total}</h3>
+            <p className="text-purple-100">Total Students</p>
+            <div className="mt-4 pt-4 border-t border-white/20 flex justify-between text-sm">
+              <span>Active: {stats.students.active}</span>
+              <span>Suspended: {stats.students.suspended}</span>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-white/20 rounded-xl">
+                <BookOpen className="w-6 h-6" />
+              </div>
+              <div className="flex items-center gap-1 text-sm font-semibold">
+                <Activity className="w-4 h-4" />
+                {stats.courses.published}/{stats.courses.total}
+              </div>
+            </div>
+            <h3 className="text-3xl font-bold mb-1">{stats.courses.total}</h3>
+            <p className="text-blue-100">Total Courses</p>
+            <div className="mt-4 pt-4 border-t border-white/20 flex justify-between text-sm">
+              <span>Published: {stats.courses.published}</span>
+              <span>Weeks: {stats.courses.totalWeeks}</span>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-white/20 rounded-xl">
+                <Award className="w-6 h-6" />
+              </div>
+              <div className="flex items-center gap-1 text-sm font-semibold">
+                <TrendingUp className="w-4 h-4" />
+                {stats.quizzes.averageScore}%
+              </div>
+            </div>
+            <h3 className="text-3xl font-bold mb-1">{stats.quizzes.total}</h3>
+            <p className="text-green-100">Active Quizzes</p>
+            <div className="mt-4 pt-4 border-t border-white/20 flex justify-between text-sm">
+              <span>Completed: {stats.quizzes.completed}</span>
+              <span>Active: {stats.quizzes.active}</span>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 text-white">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-white/20 rounded-xl">
+                <Calendar className="w-6 h-6" />
+              </div>
+              <div className="flex items-center gap-1 text-sm font-semibold">
+                <Star className="w-4 h-4" />
+                {stats.newsEvents.totalViews}
+              </div>
+            </div>
+            <h3 className="text-3xl font-bold mb-1">{stats.newsEvents.total}</h3>
+            <p className="text-orange-100">News & Events</p>
+            <div className="mt-4 pt-4 border-t border-white/20 flex justify-between text-sm">
+              <span>News: {stats.newsEvents.news}</span>
+              <span>Events: {stats.newsEvents.events}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 bg-white rounded-2xl border-2 border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Student Growth</h2>
+              <div className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-gray-400" />
+              </div>
+            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={studentTrendData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="name" stroke="#6b7280" />
+                <YAxis stroke="#6b7280" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#fff', 
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '12px',
+                    padding: '12px'
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="students" 
+                  stroke="#9179E0" 
+                  strokeWidth={3}
+                  dot={{ fill: '#9179E0', r: 6 }}
+                  activeDot={{ r: 8 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="bg-white rounded-2xl border-2 border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Course Status</h2>
+              <PieChart className="w-5 h-5 text-gray-400" />
+            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <RePieChart>
+                <Pie
+                  data={courseDistributionData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name} ${(percent || 0 * 100).toFixed(0)}%`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {courseDistributionData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </RePieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 bg-white rounded-2xl border-2 border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Quick Actions</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {quickActions.map((action, index) => {
+                const Icon = action.icon;
+                return (
+                  <a
+                    key={index}
+                    href={action.href}
+                    className="group flex items-start gap-4 p-4 rounded-xl border-2 border-gray-200 hover:border-[#9179E0] transition-all hover:shadow-lg"
+                  >
+                    <div className={`${action.color} p-3 rounded-xl text-white`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#9179E0] transition-colors">
+                        {action.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">{action.description}</p>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-[#9179E0] transition-colors" />
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border-2 border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Recent Activity</h2>
+              <Clock className="w-5 h-5 text-gray-400" />
+            </div>
+            <div className="space-y-4">
+              {activities.map((activity) => (
+                <div key={activity.id} className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0">
+                  <div className={`p-2 rounded-lg ${
+                    activity.type === 'student' ? 'bg-purple-100' :
+                    activity.type === 'course' ? 'bg-blue-100' :
+                    activity.type === 'quiz' ? 'bg-green-100' : 'bg-orange-100'
+                  }`}>
+                    {activity.type === 'student' && <UserCheck className="w-4 h-4 text-purple-600" />}
+                    {activity.type === 'course' && <BookOpen className="w-4 h-4 text-blue-600" />}
+                    {activity.type === 'quiz' && <FileText className="w-4 h-4 text-green-600" />}
+                    {activity.type === 'event' && <Calendar className="w-4 h-4 text-orange-600" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900">{activity.action}</p>
+                    <p className="text-xs text-gray-600">{activity.user}</p>
+                    <p className="text-xs text-gray-400 mt-1">{activity.timestamp}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-purple-100 rounded-xl">
+                <Star className="w-6 h-6 text-purple-600" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-1">{stats.flashcards.total}</h3>
+            <p className="text-gray-600 mb-3">Flashcards</p>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-gray-600">Views:</span>
+              <span className="font-semibold text-gray-900">{stats.flashcards.totalViews}</span>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-blue-100 rounded-xl">
+                <Users className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-1">{stats.executives.total}</h3>
+            <p className="text-gray-600 mb-3">Executives</p>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-gray-600">Active:</span>
+              <span className="font-semibold text-gray-900">{stats.executives.active}</span>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-green-100 rounded-xl">
+                <UserCheck className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-1">{stats.lecturers.total}</h3>
+            <p className="text-gray-600 mb-3">Lecturers</p>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-gray-600">Courses:</span>
+              <span className="font-semibold text-gray-900">{stats.lecturers.activeCourses}</span>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-orange-100 rounded-xl">
+                <Award className="w-6 h-6 text-orange-600" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-1">{stats.flashcards.masteredCount}</h3>
+            <p className="text-gray-600 mb-3">Mastered Cards</p>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-gray-600">Rate:</span>
+              <span className="font-semibold text-green-600">
+                {((stats.flashcards.masteredCount / stats.flashcards.total) * 100).toFixed(1)}%
+              </span>
+            </div>
           </div>
         </div>
       </div>
