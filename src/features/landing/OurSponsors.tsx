@@ -101,7 +101,7 @@ const OurSponsors = () => {
 
   return (
     <section id="sponsors" className="py-16 md:py-24 bg-gradient-to-b from-white to-gray-50 font-inter w-full">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center gap-2 mb-4">
             <Heart className="w-6 h-6 text-[#9179E0]" />
@@ -269,10 +269,13 @@ const OurSponsors = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
           <div className="bg-gradient-to-br from-[#4a368f] to-[#9179E0] rounded-3xl p-8 md:p-10 text-white">
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl hidden md:flex items-center justify-center flex-shrink-0">
                 <Handshake className="w-7 h-7" />
               </div>
               <div>
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Handshake className="w-7 h-7" />
+                </div>
                 <h3 className="text-2xl md:text-3xl font-bold mb-3">
                   Become a Sponsor
                 </h3>
@@ -290,15 +293,20 @@ const OurSponsors = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-3xl p-8 md:p-10 border-2 border-gray-200 shadow-lg">
+          <div className="bg-white rounded-3xl p-4 md:p-10 border-2 border-gray-200 shadow-lg">
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-14 h-14 bg-[#9179E0]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-14 h-14 bg-[#9179E0]/10 rounded-xl hidden md:flex items-center justify-center flex-shrink-0">
                 <Heart className="w-7 h-7 text-[#9179E0]" />
               </div>
               <div>
-                <h3 className="text-2xl md:text-3xl font-bold text-[#4a368f] mb-3">
-                  Sponsorship Benefits
-                </h3>
+                <div className='flex items-center space-x-2'>
+                  <div className="w-14 h-14 bg-[#9179E0]/10 rounded-xl md:hidden flex items-center justify-center flex-shrink-0">
+                    <Heart className="w-7 h-7 text-[#9179E0]" />
+                  </div>
+                  <h3 className="text-xl md:text-3xl font-bold text-[#4a368f] mb-3">
+                    Sponsorship Benefits
+                  </h3>
+                </div>
                 <ul className="space-y-3 text-gray-600">
                   <li className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 bg-[#9179E0] rounded-full mt-2 flex-shrink-0" />

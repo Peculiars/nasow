@@ -6,7 +6,7 @@ export const slides = [
     title: "Your Department, Your People, Your NASOWS",
     subtitle: "The heartbeat of Social Work students in UNILAG from freshers to finalists, this is home.",
     buttonText: "Join the Family",
-    buttonLink: "/join",
+    buttonLink: "/signup",
     image: "/assets/img-car-1.png"
   },
   {
@@ -14,7 +14,7 @@ export const slides = [
     title: "Welcome Back to School, NASOWS Fam!",
     subtitle: "A new semester, fresh opportunities, and bigger vibes, let's make this semester count together.",
     buttonText: "Read More",
-    buttonLink: "/news",
+    buttonLink: "/events",
     image: "/assets/img-car-2.png"
   },
   {
@@ -22,7 +22,7 @@ export const slides = [
     title: "All Your Social Work Materials in One Place",
     subtitle: "Access lecture notes, past questions, and guides designed to help every NASOWS student succeed.",
     buttonText: "Get Started",
-    buttonLink: "/resources",
+    buttonLink: "/portal/courses",
     image: "/assets/img-car-3.png"
   },
   {

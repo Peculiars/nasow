@@ -74,15 +74,14 @@ const NasowiteOfWeek = () => {
         </div>
 
         <div className="hidden lg:grid lg:grid-cols-2 gap-0 max-w-8xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden">
-          <div className="relative h-[600px]">
+          <div className="relative h-[600px] bg-gray-100">
             <Image
               src={nasowite.image}
               alt={nasowite.name}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="50vw"
             />
-            <div className="absolute inset-0 bg-[#9179E0]/10" />
           </div>
 
           <div className="p-10 flex flex-col justify-center bg-white">
@@ -197,14 +196,14 @@ const NasowiteOfWeek = () => {
               onClick={() => setIsFlipped(!isFlipped)}
             >
               <div
-                className="absolute inset-0 w-full h-full rounded-3xl shadow-xl overflow-hidden"
+                className="absolute inset-0 w-full h-full rounded-3xl shadow-xl overflow-hidden bg-gray-100"
                 style={{ backfaceVisibility: "hidden" }}
               >
                 <Image
                   src={nasowite.image}
                   alt={nasowite.name}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   sizes="100vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

@@ -176,7 +176,7 @@ const Navbar = () => {
                 {item.dropdown && (
                   <button
                     onClick={() => toggleMobileDropdown(item.id)}
-                    className="p-3 rounded-lg hover:bg-gray-50"
+                    className="p-3 rounded-lg text-gray-800 hover:bg-gray-50"
                   >
                     <ChevronDown
                       size={18}

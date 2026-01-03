@@ -164,7 +164,7 @@ const MeetTheExecutives = () => {
         <div className="text-center">
           <Link
             href="/executives"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-[#9179E0] hover:bg-[#7E6BDB] text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            className="inline-flex items-center gap-3 px-4 py-3 md:px-8 md:py-4 bg-[#9179E0] hover:bg-[#7E6BDB] text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
           >
             View Complete Executive Team
             <ArrowRight className="w-5 h-5" />

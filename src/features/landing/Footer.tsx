@@ -13,12 +13,12 @@ const Footer = () => {
     ],
     pages: [
       { name: "Executives", href: "/executives" },
-      { name: "Past Executives", href: "/past-executives" },
-      { name: "Meet the HOD", href: "/hod" },
+      { name: "Icons Of The Department", href: "/executives/icons-of-the-department" },
+      { name: "Meet the HOD", href: "/#hod" },
       { name: "Our Lecturers", href: "/lecturers" },
-      { name: "Courses", href: "/courses" },
+      { name: "Courses", href: "/portal/courses" },
       { name: "Flashcards", href: "/flashcards" },
-      { name: "NASOWites of the Week", href: "/nasowites-week" }
+      { name: "NASOWites of the Week", href: "/nasowite-of-the-week" }
     ],
     resources: [
       { name: "Academic Calendar", href: "/calendar" },

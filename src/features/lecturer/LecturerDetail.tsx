@@ -49,7 +49,7 @@ export default function LecturerDetail({ lecturer }: LecturerDetailProps) {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 -mt-8 pb-16">
+      <div className="max-w-7xl mx-auto px-4 lg:px-8 -mt-8 pb-16">
         <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100 overflow-hidden">
           <div className="md:flex">
             <div className="md:w-1/3">
@@ -64,7 +64,7 @@ export default function LecturerDetail({ lecturer }: LecturerDetailProps) {
               </div>
             </div>
 
-            <div className="md:w-2/3 p-8 lg:p-12">
+            <div className="md:w-2/3 p-4 lg:p-12">
               <div className="mb-6">
                 <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
                   {lecturer.name}
@@ -151,7 +151,7 @@ export default function LecturerDetail({ lecturer }: LecturerDetailProps) {
             </div>
           </div>
 
-          <div className="border-t border-gray-200 p-8 lg:p-12 space-y-10">
+          <div className="border-t border-gray-200 p-4 lg:p-12 space-y-10">
             {lecturer.bio && (
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">

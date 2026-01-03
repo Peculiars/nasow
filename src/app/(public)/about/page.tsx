@@ -139,29 +139,33 @@ const AboutUsPage = () => {
 
       {/* Mission & Vision */}
       <section className="py-16 md:py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Mission */}
-            <div className="bg-white rounded-2xl p-8 md:p-10 shadow-lg border-2 border-gray-100">
-              <div className="w-16 h-16 bg-[#9179E0]/10 rounded-xl flex items-center justify-center mb-6">
-                <Target className="w-8 h-8 text-[#9179E0]" />
+            <div className="bg-white rounded-2xl p-4 md:p-10 shadow-lg border-2 border-gray-100">
+              <div className="flex flex-row md:flex-col justify-start items-center md:items-start space-x-2">
+                <div className="w-16 h-16 bg-[#9179E0]/10 rounded-xl flex items-center justify-center mb-6">
+                  <Target className="w-8 h-8 text-[#9179E0]" />
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                  Our Mission
+                </h3>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-                Our Mission
-              </h3>
               <p className="text-gray-700 leading-relaxed">
                 To provide a supportive, inclusive environment that fosters academic excellence, professional growth, and social responsibility among social work students. We aim to equip our members with the knowledge, skills, and values necessary to become effective change agents in society.
               </p>
             </div>
 
             {/* Vision */}
-            <div className="bg-[#4a368f] rounded-2xl p-8 md:p-10 shadow-lg text-white">
-              <div className="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center mb-6">
-                <Lightbulb className="w-8 h-8 text-white" />
+            <div className="bg-[#4a368f] rounded-2xl p-4 md:p-10 shadow-lg text-white">
+              <div className="flex flex-row md:flex-col justify-start items-center md:items-start space-x-2">
+                <div className="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center mb-6">
+                  <Lightbulb className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                  Our Vision
+                </h3>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                Our Vision
-              </h3>
               <p className="text-white/90 leading-relaxed">
                 To be the leading social work student organization in Nigeria, recognized for producing competent, ethical, and compassionate professionals who drive positive social change and contribute meaningfully to community development and national progress.
               </p>
