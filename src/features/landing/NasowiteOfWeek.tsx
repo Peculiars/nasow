@@ -214,7 +214,7 @@ const NasowiteOfTheWeekPage = () => {
                         src={currentNasowite.image}
                         alt={currentNasowite.name}
                         fill
-                        className="object-cover"
+                        className="object-contain"
                         sizes="80vw"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
