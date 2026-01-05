@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 async function getExecutive(id: string) {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/executives?id=${id}`,
+      `${process.env.NEXT_PUBLIC_BASE_URL || 'https://nasow.vercel.app/' || 'http://localhost:3000'}/api/executives?id=${id}`,
       { cache: 'no-store' }
     );
     if (!res.ok) return null;

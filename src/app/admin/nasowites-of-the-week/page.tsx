@@ -393,7 +393,7 @@ const AdminNasowite = () => {
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9179E0]"
+                        className="w-full px-4 py-2 border border-gray-300 text-gray-800 placeholder:text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9179E0]"
                       />
                     </div>
                     <div>
