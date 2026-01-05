@@ -239,7 +239,7 @@ export default function CourseDetailPage() {
                         {week.materials.map((m) => (
                           <div
                             key={m._id}
-                            className="md:bg-white md:border rounded-lg md:p-4 flex justify-between md:hover:shadow-md"
+                            className="md:bg-white md:border rounded-lg md:p-4 flex flex-col md:flex-row items-start md:justify-between md:hover:shadow-md"
                           >
                             <div className="flex items-center gap-1 md:gap-3">
                               <span className="text-xl md:text-2xl">
@@ -256,7 +256,7 @@ export default function CourseDetailPage() {
 
                             <button
                               onClick={() => openMaterial(m)}
-                              className="flex items-center gap-2 bg-purple-600 text-white md:px-4 px-2 py-0.5 md:py-2 rounded-lg hover:bg-purple-700"
+                              className="flex items-center self-end gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
                             >
                               <ExternalLink className="hidden md:block size-4" />
                               <span className="md:text-base text-sm">Open</span>

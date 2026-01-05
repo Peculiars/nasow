@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowRight, Mail, Phone, Instagram, Linkedin, } from "lucide-react";
+import { ArrowRight, Mail, Phone, Instagram, Linkedin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -59,6 +59,9 @@ const MeetTheExecutives = () => {
     fetchExecutives();
   }, []);
 
+  // Only take the first 3 executives
+  const displayedExecutives = executives.slice(0, 3);
+
   return (
     <section className="py-16 md:py-24 bg-white font-inter w-full">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -73,12 +76,13 @@ const MeetTheExecutives = () => {
             Dedicated student leaders committed to excellence, service, and unity
           </p>
         </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-12">
           {loading
             ? Array.from({ length: 3 }).map((_, i) => (
                 <ExecutiveSkeleton key={i} />
               ))
-            : executives.map((exec) => (
+            : displayedExecutives.map((exec) => (
                 <div
                   key={exec._id}
                   className="group bg-white rounded-2xl shadow-lg border-2 border-gray-100 overflow-hidden hover:shadow-2xl hover:border-[#9179E0]/30 transition-all duration-300 hover:-translate-y-2"
@@ -119,11 +123,9 @@ const MeetTheExecutives = () => {
 
                         {exec?.socialMedia?.instagram && (
                           <Link
-                            href={`https://instagram.com/${exec?.socialMedia?.instagram.replace(
-                              "@",
-                              ""
-                            )}`}
+                            href={`https://instagram.com/${exec.socialMedia.instagram.replace("@", "")}`}
                             target="_blank"
+                            rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
                             className="w-10 h-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center"
                           >
@@ -133,8 +135,9 @@ const MeetTheExecutives = () => {
 
                         {exec?.socialMedia?.linkedin && (
                           <Link
-                            href={`https://linkedin.com/in/${exec?.socialMedia?.linkedin}`}
+                            href={`https://linkedin.com/in/${exec.socialMedia.linkedin}`}
                             target="_blank"
+                            rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
                             className="w-10 h-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center"
                           >
@@ -161,6 +164,7 @@ const MeetTheExecutives = () => {
                 </div>
               ))}
         </div>
+
         <div className="text-center">
           <Link
             href="/executives"

@@ -4,13 +4,15 @@ import Link from "next/link";
 
 async function getLecturers() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/lecturers?status=active`, {
-      cache: 'no-store',
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/lecturers?status=active`,
+      { cache: 'no-store' }
+    );
 
     if (!res.ok) return [];
     const data = await res.json();
-    return data.slice(0, 4);
+    // Only return the first 3 lecturers
+    return data.slice(0, 3);
   } catch (error) {
     console.error('Error fetching lecturers:', error);
     return [];
@@ -19,9 +21,10 @@ async function getLecturers() {
 
 async function getLecturersCount() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/lecturers?status=active`, {
-      cache: 'no-store',
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/lecturers?status=active`,
+      { cache: 'no-store' }
+    );
 
     if (!res.ok) return 0;
     const data = await res.json();
@@ -54,8 +57,9 @@ export default async function MeetOurLecturers() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {lecturers.map((lecturer:any) => (
+        {/* Changed to lg:grid-cols-3 for better spacing with only 3 items */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {lecturers.map((lecturer: any) => (
             <div
               key={lecturer._id}
               className="group bg-white rounded-2xl shadow-md border-2 border-gray-100 overflow-hidden hover:shadow-xl hover:border-[#9179E0]/20 transition-all duration-300 hover:-translate-y-2"
@@ -66,7 +70,7 @@ export default async function MeetOurLecturers() {
                   alt={lecturer.name}
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-500"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 
@@ -110,6 +114,9 @@ export default async function MeetOurLecturers() {
                           {course}
                         </span>
                       ))}
+                      {lecturer.courses.length > 2 && (
+                        <span className="text-xs text-gray-500">+{lecturer.courses.length - 2} more</span>
+                      )}
                     </div>
                   </div>
                 )}
@@ -132,7 +139,7 @@ export default async function MeetOurLecturers() {
             className="inline-flex items-center gap-3 px-8 py-4 bg-[#9179E0] hover:bg-[#7E6BDB] text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
           >
             <GraduationCap className="w-5 h-5" />
-            View All Lecturers
+            View All Lecturers ({totalLecturers})
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
@@ -145,7 +152,7 @@ export default async function MeetOurLecturers() {
             <p className="text-sm text-gray-600 font-medium">Expert Lecturers</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl md:text-4xl font-bold text-[#9179E0] mb-1">15+</p>
+            <p className="text-3xl md:text-4xl font-bold text-[#9179E0] mb-1">25+</p>
             <p className="text-sm text-gray-600 font-medium">Years Experience</p>
           </div>
           <div className="text-center">

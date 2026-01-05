@@ -28,6 +28,8 @@ export async function uploadCourseImage(
         {
           folder: 'nasows/courses/covers',
           resource_type: 'image',
+          type: 'upload', // Make it public
+          access_mode: 'public', // Ensure public access
           transformation: [
             { quality: 'auto:good' },
             { fetch_format: 'auto' }
@@ -80,7 +82,9 @@ export async function uploadCourseMaterial(
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: 'nasows/courses/materials',
-          resource_type: 'raw', 
+          resource_type: 'raw',
+          type: 'upload', // ✅ Make it public (not authenticated)
+          access_mode: 'public', // ✅ Ensure public access
           format: file.name.split('.').pop()
         },
         (error, result) => {

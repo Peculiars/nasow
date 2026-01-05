@@ -61,6 +61,7 @@ export default function CoursesPage() {
       }
 
       const data = await response.json();
+      console.log('data', data)
       setCourses(data.data);
       setFilteredCourses(data.data);
       setStudentInfo(data.student);

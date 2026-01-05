@@ -7,7 +7,7 @@ export const slides = [
     subtitle: "The heartbeat of Social Work students in UNILAG from freshers to finalists, this is home.",
     buttonText: "Join the Family",
     buttonLink: "/signup",
-    image: "/assets/img-car-1.png"
+    image: "/assets/img-car-5.JPG"
   },
   {
     id: 2,
@@ -15,7 +15,7 @@ export const slides = [
     subtitle: "A new semester, fresh opportunities, and bigger vibes, let's make this semester count together.",
     buttonText: "Read More",
     buttonLink: "/events",
-    image: "/assets/img-car-2.png"
+    image: "/assets/img-car-9.jpg"
   },
   {
     id: 3,
@@ -23,7 +23,7 @@ export const slides = [
     subtitle: "Access lecture notes, past questions, and guides designed to help every NASOWS student succeed.",
     buttonText: "Get Started",
     buttonLink: "/portal/courses",
-    image: "/assets/img-car-3.png"
+    image: "/assets/img-car-6.jpg"
   },
   {
     id: 4,
@@ -31,7 +31,7 @@ export const slides = [
     subtitle: "The leaders representing and serving Social Work students across UNILAG, dedicated to growth, impact, and unity.",
     buttonText: "Meet Them",
     buttonLink: "/executives",
-    image: "/assets/img-car-4.png"
+    image: "/assets/img-car-5.JPG"
   },
   {
     id: 5,
@@ -39,7 +39,7 @@ export const slides = [
     subtitle: "Stay in the loop with NASOWS events — from fresher's orientation to outreaches and campus vibes. Don't miss out!",
     buttonText: "Stay Updated",
     buttonLink: "/events",
-    image: "/assets/img-car-3.png"
+    image: "/assets/img-car-8.jpg"
   }
 ];
 

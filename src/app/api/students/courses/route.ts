@@ -45,45 +45,43 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
 
-    const levelNumber = student.level.replace('L', '');
-    
-    const studentTypeMap: { [key: string]: string } = {
-      'Full-time': 'FULL_TIME',
-      'ICE': 'ICE',
-      'FULL_TIME': 'FULL_TIME'
-    };
+    // Extract just the numeric part (100, 200, 300, etc.)
+    // Extract just the numeric part (100, 200, 300, etc.)
+    const levelNumber = student.level.replace(/\D/g, ''); // Remove all non-digits
 
-    const normalizedStudentType = studentTypeMap[student.studentType] || student.studentType;
-
+    // Build the base filter with proper $and structure
     const filter: any = {
-      $or: [
-        { level: student.level },
-        { level: levelNumber },
-        { level: `${levelNumber}L` }
-      ],
-      studentType: {
-        $in: [student.studentType, normalizedStudentType]
-      },
-      status: { $in: ['published', 'PUBLISHED'] }
-    };
-
-    if (search) {
-      filter.$and = [
-        filter.$or ? { $or: filter.$or } : {},
+      $and: [
+        // Level matching - matches "100L", "100 Level", "100", etc.
         {
           $or: [
-            { title: { $regex: search, $options: 'i' } },
-            { courseCode: { $regex: search, $options: 'i' } },
-            { lecturerName: { $regex: search, $options: 'i' } }
+            { level: student.level },
+            { level: levelNumber },
+            { level: `${levelNumber}L` },
+            { level: `${levelNumber} Level` },
+            { level: { $regex: `^${levelNumber}`, $options: 'i' } } // Matches anything starting with the number
           ]
+        },
+        // Status matching
+        {
+          status: { $in: ['published', 'PUBLISHED'] }
         }
-      ];
-      delete filter.$or;
+      ]
+    };
+
+    // Add search filter if provided
+    if (search) {
+      filter.$and.push({
+        $or: [
+          { title: { $regex: search, $options: 'i' } },
+          { courseCode: { $regex: search, $options: 'i' } },
+          { lecturerName: { $regex: search, $options: 'i' } }
+        ]
+      });
     }
 
     console.log('Student level:', student.level);
-    console.log('Student type:', student.studentType);
-    console.log('Normalized type:', normalizedStudentType);
+    console.log('Level number:', levelNumber);
     console.log('Query filter:', JSON.stringify(filter, null, 2));
 
     const courses = await Course.find(filter)
@@ -91,6 +89,11 @@ export async function GET(request: NextRequest) {
       .lean();
 
     console.log('Courses found:', courses.length);
+    
+    // Additional debugging: log the levels of found courses
+    if (courses.length > 0) {
+      console.log('Course levels found:', courses.map(c => ({ title: c.title, level: c.level })));
+    }
 
     return NextResponse.json({
       success: true,

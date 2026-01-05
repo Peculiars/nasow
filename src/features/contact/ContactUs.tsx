@@ -1,22 +1,7 @@
 "use client"
-import { useState } from "react"
-import type React from "react"
-
-import {
-  Mail,
-  Phone,
-  MapPin,
-  Send,
-  MessageSquare,
-  Users,
-  Clock,
-  CheckCircle,
-  Instagram,
-  Facebook,
-  Twitter,
-  Linkedin,
-} from "lucide-react"
-import { submitContactForm } from "@/src/lib/contact"
+import { useState } from "react";
+import { Mail, Phone, MapPin, Send, MessageSquare, Users, Clock, CheckCircle, Instagram, Facebook, Twitter, Linkedin } from "lucide-react";
+import { PiTiktokLogoLight } from "react-icons/pi";
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -24,50 +9,135 @@ const ContactUs = () => {
     email: "",
     level: "",
     subject: "",
-    message: "",
-  })
-  const [submitted, setSubmitted] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+    message: ""
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-
+    e.preventDefault();
+    
     if (!formData.name || !formData.email || !formData.level || !formData.subject || !formData.message) {
-      alert("Please fill in all required fields.")
-      return
+      alert('Please fill in all required fields.');
+      return;
     }
 
-    setLoading(true)
-    setError("")
+    setIsSubmitting(true);
 
-    const result = await submitContactForm(formData)
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
 
-    if (result.success) {
-      setSubmitted(true)
-      setFormData({
-        name: "",
-        email: "",
-        level: "",
-        subject: "",
-        message: "",
-      })
-      setTimeout(() => {
-        setSubmitted(false)
-      }, 7000)
-    } else {
-      setError(result.error || "Failed to submit form. Please try again.")
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmitted(true);
+        setTimeout(() => {
+          setSubmitted(false);
+          setFormData({
+            name: "",
+            email: "",
+            level: "",
+            subject: "",
+            message: ""
+          });
+        }, 3000);
+      } else {
+        alert(data.error || 'Failed to submit form. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit form. Please check your connection and try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setLoading(false)
-  }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
-    })
-  }
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const contactInfo = [
+    {
+      icon: Mail,
+      title: "Email Us",
+      info: "unilagnasows@gmail.com",
+      description: "Send us your questions anytime",
+      color: "purple"
+    },
+    {
+      icon: Phone,
+      title: "Call Us",
+      info: "+234 814 650 6649",
+      description: "Mon-Fri, 9AM-5PM WAT",
+      color: "green"
+    },
+    {
+      icon: MapPin,
+      title: "Visit Us",
+      info: "Social Work Department, University of Lagos",
+      description: "Akoka, Lagos, Nigeria",
+      color: "blue"
+    },
+    {
+      icon: Clock,
+      title: "Office Hours",
+      info: "Mon - Fri: 9:00 AM - 5:00 PM",
+      description: "Closed on weekends & holidays",
+      color: "yellow"
+    }
+  ];
+
+  const excos = [
+    {
+      name: "Ezechukwu Naomi Onyinyechi",
+      position: "President",
+      email: "",
+      image: "EN"
+    },
+    {
+      name: "Oluwafemi Philip Oreoluwa",
+      position: "Vice President",
+      email: "oreoluwafemi247@gmail.com",
+      image: "OO"
+    },
+    {
+      name: "Joshua Joy Temitope",
+      position: "General Secretary",
+      email: "joytemitopej@gmail.com",
+      image: "JT"
+    },
+    {
+      name: "Bamigboye Basirat Eniola",
+      position: "Treasurer",
+      email: "basiratbamigboye94@gmail.com",
+      image: "BE"
+    }
+  ];
+
+  const socialLinks = [
+    { icon: Instagram, link: "https://instagram.com/Nasows_unilag", color: "bg-pink-500", label: "Instagram" },
+    { icon: PiTiktokLogoLight, link: "https://www.tiktok.com/@nasows_unilag", color: "bg-blue-700", label: "Tiktok" }
+  ];
+
+  const getColorClasses = (color: string) => {
+    const colors: { [key: string]: { bg: string; border: string; text: string; icon: string } } = {
+      purple: { bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-600", icon: "bg-[#9179E0]" },
+      blue: { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-600", icon: "bg-blue-500" },
+      green: { bg: "bg-green-50", border: "border-green-200", text: "text-green-600", icon: "bg-green-500" },
+      yellow: { bg: "bg-yellow-50", border: "border-yellow-200", text: "text-yellow-600", icon: "bg-yellow-500" }
+    };
+    return colors[color] || colors.purple;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 font-inter">
@@ -78,10 +148,11 @@ const ContactUs = () => {
             <MessageSquare className="w-5 h-5 text-white" />
             <span className="text-sm font-bold text-white tracking-wide">GET IN TOUCH</span>
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">Contact Us</h1>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+            Contact Us
+          </h1>
           <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto">
-            Have questions or need assistance? We're here to help! Reach out to us and we'll get back to you as soon as
-            possible.
+            Have questions or need assistance? We're here to help! Reach out to us and we'll get back to you as soon as possible.
           </p>
         </div>
       </section>
@@ -90,43 +161,11 @@ const ContactUs = () => {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                icon: Mail,
-                title: "Email Us",
-                info: "socialwork@university.edu.ng",
-                description: "Send us your questions anytime",
-                color: "purple",
-              },
-              {
-                icon: Phone,
-                title: "Call Us",
-                info: "+234 803 456 7890",
-                description: "Mon-Fri, 9AM-5PM WAT",
-                color: "green",
-              },
-              {
-                icon: MapPin,
-                title: "Visit Us",
-                info: "Social Work Department, University of Lagos",
-                description: "Akoka, Lagos, Nigeria",
-                color: "blue",
-              },
-              {
-                icon: Clock,
-                title: "Office Hours",
-                info: "Mon - Fri: 9:00 AM - 5:00 PM",
-                description: "Closed on weekends & holidays",
-                color: "yellow",
-              },
-            ].map((info, index) => {
-              const colors = getColorClasses(info.color)
-              const Icon = info.icon
+            {contactInfo.map((info, index) => {
+              const colors = getColorClasses(info.color);
+              const Icon = info.icon;
               return (
-                <div
-                  key={index}
-                  className={`${colors.bg} rounded-2xl border-2 ${colors.border} p-6 hover:shadow-xl transition-all`}
-                >
+                <div key={index} className={`${colors.bg} rounded-2xl border-2 ${colors.border} p-6 hover:shadow-xl transition-all`}>
                   <div className={`w-14 h-14 ${colors.icon} rounded-xl flex items-center justify-center mb-4`}>
                     <Icon className="w-7 h-7 text-white" />
                   </div>
@@ -134,7 +173,7 @@ const ContactUs = () => {
                   <p className={`font-bold ${colors.text} mb-2`}>{info.info}</p>
                   <p className="text-sm text-gray-600">{info.description}</p>
                 </div>
-              )
+              );
             })}
           </div>
         </div>
@@ -147,7 +186,9 @@ const ContactUs = () => {
             {/* Contact Form */}
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Send Us a Message</h2>
-              <p className="text-gray-600 mb-8">Fill out the form below and we'll respond within 24 hours</p>
+              <p className="text-gray-600 mb-8">
+                Fill out the form below and we'll respond within 24 hours
+              </p>
 
               {submitted ? (
                 <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-8 text-center">
@@ -155,50 +196,50 @@ const ContactUs = () => {
                     <CheckCircle className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">Message Sent!</h3>
-                  <p className="text-gray-600">Thank you for contacting us. We'll get back to you soon.</p>
+                  <p className="text-gray-600">
+                    Thank you for contacting us. We'll get back to you soon.
+                  </p>
                 </div>
               ) : (
                 <div className="bg-white rounded-2xl border-2 border-gray-200 p-5 md:p-8 shadow-lg">
-                  {error && (
-                    <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4 mb-6">
-                      <p className="text-red-700 font-medium">{error}</p>
-                    </div>
-                  )}
                   <div className="space-y-5">
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Full Name *</label>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Full Name *
+                      </label>
                       <input
                         type="text"
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        disabled={loading}
                         placeholder="Enter your full name"
-                        className="w-full px-4 py-3 border-2 border-gray-300 text-gray-800 placeholder:text-gray-500 cursor-pointer rounded-xl focus:border-[#9179E0] focus:outline-none transition-colors disabled:bg-gray-100"
+                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-[#9179E0] focus:outline-none transition-colors"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Email Address *</label>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Email Address *
+                      </label>
                       <input
                         type="email"
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        disabled={loading}
                         placeholder="your.email@example.com"
-                        className="w-full px-4 py-3 border-2 border-gray-300 text-gray-800 placeholder:text-gray-500 cursor-pointer rounded-xl focus:border-[#9179E0] focus:outline-none transition-colors disabled:bg-gray-100"
+                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-[#9179E0] focus:outline-none transition-colors"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Level *</label>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Level *
+                      </label>
                       <select
                         name="level"
                         value={formData.level}
                         onChange={handleChange}
-                        disabled={loading}
-                        className="w-full px-4 py-3 border-2 border-gray-300 text-gray-800 placeholder:text-gray-500 cursor-pointer rounded-xl focus:border-[#9179E0] focus:outline-none transition-colors disabled:bg-gray-100"
+                        className="w-full px-4 py-3 border-2 border-gray-300 text-gray-800 placeholder:text-gray-500 cursor-pointer rounded-xl focus:border-[#9179E0] focus:outline-none transition-colors"
                       >
                         <option value="">Select your level</option>
                         <option value="100">100 Level</option>
@@ -211,38 +252,40 @@ const ContactUs = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Subject *</label>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Subject *
+                      </label>
                       <input
                         type="text"
                         name="subject"
                         value={formData.subject}
                         onChange={handleChange}
-                        disabled={loading}
                         placeholder="What is this about?"
-                        className="w-full px-4 py-3 border-2 border-gray-300 text-gray-800 placeholder:text-gray-500 cursor-pointer rounded-xl focus:border-[#9179E0] focus:outline-none transition-colors disabled:bg-gray-100"
+                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-[#9179E0] focus:outline-none transition-colors"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Message *</label>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Message *
+                      </label>
                       <textarea
                         name="message"
                         value={formData.message}
                         onChange={handleChange}
-                        disabled={loading}
                         rows={6}
                         placeholder="Tell us more about your inquiry..."
-                        className="w-full px-4 py-3 border-2 border-gray-300 text-gray-800 placeholder:text-gray-500 cursor-pointer rounded-xl focus:border-[#9179E0] focus:outline-none transition-colors resize-none disabled:bg-gray-100"
+                        className="w-full px-4 py-3 border-2 border-gray-300 text-gray-800 placeholder:text-gray-500 rounded-xl focus:border-[#9179E0] focus:outline-none transition-colors resize-none"
                       />
                     </div>
 
                     <button
                       onClick={handleSubmit}
-                      disabled={loading}
-                      className="w-full py-4 bg-[#9179E0] text-white font-bold rounded-xl hover:bg-[#7E6BDB] disabled:bg-gray-400 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                      disabled={isSubmitting}
+                      className="w-full py-4 bg-[#9179E0] text-white font-bold rounded-xl hover:bg-[#7E6BDB] transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Send className="w-5 h-5" />
-                      {loading ? "Sending..." : "Send Message"}
+                      {isSubmitting ? 'Sending...' : 'Send Message'}
                     </button>
                   </div>
                 </div>
@@ -252,35 +295,12 @@ const ContactUs = () => {
             {/* Executive Officers */}
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Meet Our Executives</h2>
-              <p className="text-gray-600 mb-8">Get in touch with our executive officers directly</p>
+              <p className="text-gray-600 mb-8">
+                Get in touch with our executive officers directly
+              </p>
 
               <div className="space-y-4">
-                {[
-                  {
-                    name: "Ezechukwu Naomi Onyinyechi",
-                    position: "President",
-                    email: "president@socialwork.ng",
-                    image: "EN",
-                  },
-                  {
-                    name: "Oluwafemi Philip Oreoluwa",
-                    position: "Vice President",
-                    email: "vp@socialwork.ng",
-                    image: "OO",
-                  },
-                  {
-                    name: "Joshua Joy Temitope",
-                    position: "General Secretary",
-                    email: "secretary@socialwork.ng",
-                    image: "JT",
-                  },
-                  {
-                    name: "Bamigboye Basirat Eniola",
-                    position: "Treasurer",
-                    email: "treasurer@socialwork.ng",
-                    image: "BE",
-                  },
-                ].map((exco, index) => (
+                {excos.map((exco, index) => (
                   <div
                     key={index}
                     className="bg-white rounded-2xl border-2 border-gray-200 p-6 hover:border-[#9179E0] hover:shadow-lg transition-all"
@@ -311,15 +331,12 @@ const ContactUs = () => {
                   <Users className="w-5 h-5 text-[#9179E0]" />
                   Follow Us on Social Media
                 </h3>
-                <p className="text-sm text-gray-600 mb-4">Stay updated with our latest news and activities</p>
+                <p className="text-sm text-gray-600 mb-4">
+                  Stay updated with our latest news and activities
+                </p>
                 <div className="flex gap-3">
-                  {[
-                    { icon: Instagram, link: "#", color: "bg-pink-500", label: "Instagram" },
-                    { icon: Facebook, link: "#", color: "bg-blue-600", label: "Facebook" },
-                    { icon: Twitter, link: "#", color: "bg-sky-500", label: "Twitter" },
-                    { icon: Linkedin, link: "#", color: "bg-blue-700", label: "LinkedIn" },
-                  ].map((social, index) => {
-                    const Icon = social.icon
+                  {socialLinks.map((social, index) => {
+                    const Icon = social.icon;
                     return (
                       <a
                         key={index}
@@ -329,7 +346,7 @@ const ContactUs = () => {
                       >
                         <Icon className="w-6 h-6 text-white" />
                       </a>
-                    )
+                    );
                   })}
                 </div>
               </div>
@@ -342,31 +359,32 @@ const ContactUs = () => {
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
-            <p className="text-gray-600">Quick answers to common questions</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-gray-600">
+              Quick answers to common questions
+            </p>
           </div>
 
           <div className="space-y-4">
             {[
               {
                 question: "How can I join the Social Work Students Association?",
-                answer:
-                  "All students enrolled in the Social Work program are automatically members. Simply register through our portal to access exclusive benefits.",
+                answer: "All students enrolled in the Social Work program are automatically members. Simply register through our portal to access exclusive benefits."
               },
               {
                 question: "How do I participate in quiz competitions?",
-                answer:
-                  "Navigate to the Quiz Competition section, select an active quiz, register with your details, and start competing for prizes!",
+                answer: "Navigate to the Quiz Competition section, select an active quiz, register with your details, and start competing for prizes!"
               },
               {
                 question: "Can I suggest new flashcard topics?",
-                answer: "Send us your suggestions through this contact form or email our academic officer directly.",
+                answer: "Absolutely! Send us your suggestions through this contact form or email our academic officer directly."
               },
               {
                 question: "What are the office hours?",
-                answer:
-                  "Our office is open Monday to Friday, 9:00 AM to 5:00 PM WAT. We're closed on weekends and public holidays.",
-              },
+                answer: "Our office is open Monday to Friday, 9:00 AM to 5:00 PM WAT. We're closed on weekends and public holidays."
+              }
             ].map((faq, index) => (
               <details
                 key={index}
@@ -374,9 +392,13 @@ const ContactUs = () => {
               >
                 <summary className="font-bold text-gray-900 cursor-pointer list-none flex items-center justify-between">
                   {faq.question}
-                  <span className="text-[#9179E0] group-open:rotate-180 transition-transform">▼</span>
+                  <span className="text-[#9179E0] group-open:rotate-180 transition-transform">
+                    ▼
+                  </span>
                 </summary>
-                <p className="text-gray-600 mt-4 leading-relaxed">{faq.answer}</p>
+                <p className="text-gray-600 mt-4 leading-relaxed">
+                  {faq.answer}
+                </p>
               </details>
             ))}
           </div>
@@ -388,13 +410,13 @@ const ContactUs = () => {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Find Us</h2>
           <div className="rounded-2xl overflow-hidden shadow-xl border-2 border-gray-200">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.0457860700526!2d3.3890857102107237!3d6.515889193449343!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8d14ca094d83%3A0x669491a69639e951!2sFaculty%20of%20Social%20Science%2C%20UNILAG!5e0!3m2!1sen!2sng!4v1767440036817!5m2!1sen!2sng"
-              width="100%"
-              height="450"
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.0457860700526!2d3.3890857102107237!3d6.515889193449343!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8d14ca094d83%3A0x669491a69639e951!2sFaculty%20of%20Social%20Science%2C%20UNILAG!5e0!3m2!1sen!2sng!4v1767440036817!5m2!1sen!2sng" 
+              width="100%" 
+              height="450" 
               style={{ border: 0 }}
               allowFullScreen={true}
-              loading="lazy"
+              loading="lazy" 
               referrerPolicy="no-referrer-when-downgrade"
               title="University of Lagos Social Science Faculty Location"
             />
@@ -402,17 +424,7 @@ const ContactUs = () => {
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-function getColorClasses(color: string) {
-  const colors: { [key: string]: { bg: string; border: string; text: string; icon: string } } = {
-    purple: { bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-600", icon: "bg-[#9179E0]" },
-    blue: { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-600", icon: "bg-blue-500" },
-    green: { bg: "bg-green-50", border: "border-green-200", text: "text-green-600", icon: "bg-green-500" },
-    yellow: { bg: "bg-yellow-50", border: "border-yellow-200", text: "text-yellow-600", icon: "bg-yellow-500" },
-  }
-  return colors[color] || colors.purple
-}
-
-export default ContactUs
+export default ContactUs;

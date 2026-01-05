@@ -27,6 +27,12 @@ export interface Student {
   profileImage?: string;
   level?: StudentLevel;
   studentType?: StudentType;
+  matricNumber?: string;
+  dateOfBirth?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  bio?: string;
   profileCompleted: boolean;
   status: StudentStatus;
   totalScore: number;
@@ -85,12 +91,19 @@ export interface UpdateStudentPayload {
   email?: string;
   level?: StudentLevel;
   studentType?: StudentType;
+  matricNumber?: string;
+  dateOfBirth?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  bio?: string;
 }
 
 export interface CompleteProfilePayload {
   level: StudentLevel;
   studentType: StudentType;
   phoneNumber?: string;
+  matricNumber?: string;
 }
 
 export interface StudentActionPayload {

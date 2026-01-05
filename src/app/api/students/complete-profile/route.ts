@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { level, studentType, phoneNumber } = body;
+    const { level, studentType, phoneNumber, matricNumber } = body;
 
     if (!level || !studentType) {
       return NextResponse.json(

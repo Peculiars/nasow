@@ -283,7 +283,7 @@ const OurSponsors = () => {
                   Partner with NASOWS UNILAG to empower the next generation of social workers and create lasting impact in communities across Nigeria.
                 </p>
                 <Link
-                  href="/become-sponsor"
+                  href="mailto:unilagnasows@gmail.com"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#4a368f] rounded-lg font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105"
                 >
                   Partner With Us

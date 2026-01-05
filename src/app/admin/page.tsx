@@ -2,10 +2,11 @@
 import { useState, useEffect } from 'react';
 import { 
   Users, BookOpen, Calendar, Award, TrendingUp, AlertCircle,
-  FileText, Star, UserCheck, Clock, ArrowUpRight, ArrowDownRight,
-  PieChart, BarChart3, Activity, ChevronRight, Loader2
+  FileText, Star, UserCheck, Clock, ChevronRight, Loader2, Menu, X,
+  Settings, LogOut, Home, GraduationCap, MessageSquare,
+  Layers, Grid, Bell, Activity, BarChart3, PieChart as PieChartIcon
 } from 'lucide-react';
-import { LineChart, Line, BarChart, Bar, PieChart as RePieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, PieChart as RePieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface DashboardStats {
   students: {
@@ -48,22 +49,18 @@ interface DashboardStats {
     total: number;
     activeCourses: number;
   };
+  contacts: {
+    total: number;
+    unread: number;
+  };
 }
 
 interface ActivityItem {
   id: string;
-  type: 'student' | 'course' | 'quiz' | 'event';
+  type: 'student' | 'course' | 'quiz' | 'event' | 'contact';
   action: string;
   user: string;
   timestamp: string;
-}
-
-interface QuickAction {
-  title: string;
-  description: string;
-  icon: any;
-  href: string;
-  color: string;
 }
 
 const COLORS = ['#9179E0', '#4ade80', '#fbbf24', '#f87171', '#60a5fa', '#a78bfa'];
@@ -73,6 +70,8 @@ const AdminDashboard = () => {
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('week');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState('dashboard');
 
   useEffect(() => {
     fetchDashboardData();
@@ -81,12 +80,13 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     setIsLoading(true);
     try {
-      const [studentsRes, coursesRes, flashcardsRes, newsEventsRes, executivesRes] = await Promise.all([
+      const [studentsRes, coursesRes, flashcardsRes, newsEventsRes, executivesRes, contactsRes] = await Promise.all([
         fetch('/api/admin/students/stats'),
         fetch('/api/admin/courses?limit=1000'),
         fetch('/api/flashcards/stats'),
         fetch('/api/news-events?limit=1000'),
-        fetch('/api/admin/executives')
+        fetch('/api/admin/executives'),
+        fetch('/api/contact?limit=1000')
       ]);
 
       const studentsData = await studentsRes.json();
@@ -94,10 +94,12 @@ const AdminDashboard = () => {
       const flashcardsData = await flashcardsRes.json();
       const newsEventsData = await newsEventsRes.json();
       const executivesData = await executivesRes.json();
+      const contactsData = await contactsRes.json();
 
       const courses = coursesData.data || [];
       const newsEvents = newsEventsData.data || [];
       const executives = executivesData.data || [];
+      const contacts = contactsData.submissions || [];
 
       setStats({
         students: {
@@ -142,14 +144,19 @@ const AdminDashboard = () => {
         lecturers: {
           total: 24,
           activeCourses: courses.length
+        },
+        contacts: {
+          total: contacts.length,
+          unread: contacts.filter((c: any) => c.status === 'unread').length
         }
       });
 
       setActivities([
         { id: '1', type: 'student', action: 'New student registered', user: 'John Doe', timestamp: '2 minutes ago' },
         { id: '2', type: 'course', action: 'Course published', user: 'Dr. Smith', timestamp: '15 minutes ago' },
-        { id: '3', type: 'quiz', action: 'Quiz completed', user: 'Jane Smith', timestamp: '1 hour ago' },
-        { id: '4', type: 'event', action: 'Event created', user: 'Admin', timestamp: '2 hours ago' }
+        { id: '3', type: 'contact', action: 'New contact submission', user: 'Jane Smith', timestamp: '30 minutes ago' },
+        { id: '4', type: 'quiz', action: 'Quiz completed', user: 'Mike Johnson', timestamp: '1 hour ago' },
+        { id: '5', type: 'event', action: 'Event created', user: 'Admin', timestamp: '2 hours ago' }
       ]);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -158,35 +165,16 @@ const AdminDashboard = () => {
     }
   };
 
-  const quickActions: QuickAction[] = [
-    {
-      title: 'Manage Lecturers',
-      description: 'View and manage lecturer profiles',
-      icon: Users,
-      href: '/admin/lecturers',
-      color: 'bg-purple-500'
-    },
-    {
-      title: 'Create Course',
-      description: 'Add new course material',
-      icon: BookOpen,
-      href: '/admin/courses/create',
-      color: 'bg-blue-500'
-    },
-    {
-      title: 'Create Quiz',
-      description: 'Design new assessment',
-      icon: FileText,
-      href: '/admin/quizzes',
-      color: 'bg-green-500'
-    },
-    {
-      title: 'Add Event',
-      description: 'Schedule new event',
-      icon: Calendar,
-      href: '/admin/events',
-      color: 'bg-orange-500'
-    }
+  const navigationItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: Home, href: '/admin' },
+    { id: 'students', label: 'Students', icon: Users, href: '/admin/students' },
+    { id: 'lecturers', label: 'Lecturers', icon: GraduationCap, href: '/admin/lecturers' },
+    { id: 'courses', label: 'Courses', icon: BookOpen, href: '/admin/courses' },
+    { id: 'quizzes', label: 'Quizzes', icon: FileText, href: '/admin/quizzes' },
+    { id: 'flashcards', label: 'Flashcards', icon: Layers, href: '/admin/flashcards' },
+    { id: 'events', label: 'News & Events', icon: Calendar, href: '/admin/events' },
+    { id: 'contacts', label: 'Contacts', icon: MessageSquare, href: '/admin/contacts', badge: stats?.contacts.unread || 0 },
+    { id: 'executives', label: 'Executives', icon: Award, href: '/admin/executives' }
   ];
 
   const studentTrendData = [
@@ -203,11 +191,6 @@ const AdminDashboard = () => {
     { name: 'Drafts', value: stats.courses.drafts }
   ] : [];
 
-  const levelDistributionData = stats ? Object.entries(stats.flashcards.byLevel).map(([level, count]) => ({
-    name: level,
-    value: count
-  })) : [];
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -219,272 +202,296 @@ const AdminDashboard = () => {
   if (!stats) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8 font-inter">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
-            <p className="text-gray-600 mt-1">Welcome back! Here's what's happening today.</p>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <select
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value as any)}
-              className="px-4 py-2 border-2 border-gray-300 rounded-xl text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-[#9179E0] cursor-pointer"
-            >
-              <option value="week">Last 7 days</option>
-              <option value="month">Last 30 days</option>
-              <option value="year">Last year</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-white/20 rounded-xl">
-                <Users className="w-6 h-6" />
-              </div>
-              <div className="flex items-center gap-1 text-sm font-semibold">
-                <TrendingUp className="w-4 h-4" />
-                {stats.students.growth}%
-              </div>
-            </div>
-            <h3 className="text-3xl font-bold mb-1">{stats.students.total}</h3>
-            <p className="text-purple-100">Total Students</p>
-            <div className="mt-4 pt-4 border-t border-white/20 flex justify-between text-sm">
-              <span>Active: {stats.students.active}</span>
-              <span>Suspended: {stats.students.suspended}</span>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-white/20 rounded-xl">
-                <BookOpen className="w-6 h-6" />
-              </div>
-              <div className="flex items-center gap-1 text-sm font-semibold">
-                <Activity className="w-4 h-4" />
-                {stats.courses.published}/{stats.courses.total}
-              </div>
-            </div>
-            <h3 className="text-3xl font-bold mb-1">{stats.courses.total}</h3>
-            <p className="text-blue-100">Total Courses</p>
-            <div className="mt-4 pt-4 border-t border-white/20 flex justify-between text-sm">
-              <span>Published: {stats.courses.published}</span>
-              <span>Weeks: {stats.courses.totalWeeks}</span>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-white/20 rounded-xl">
-                <Award className="w-6 h-6" />
-              </div>
-              <div className="flex items-center gap-1 text-sm font-semibold">
-                <TrendingUp className="w-4 h-4" />
-                {stats.quizzes.averageScore}%
-              </div>
-            </div>
-            <h3 className="text-3xl font-bold mb-1">{stats.quizzes.total}</h3>
-            <p className="text-green-100">Active Quizzes</p>
-            <div className="mt-4 pt-4 border-t border-white/20 flex justify-between text-sm">
-              <span>Completed: {stats.quizzes.completed}</span>
-              <span>Active: {stats.quizzes.active}</span>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 text-white">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-white/20 rounded-xl">
-                <Calendar className="w-6 h-6" />
-              </div>
-              <div className="flex items-center gap-1 text-sm font-semibold">
-                <Star className="w-4 h-4" />
-                {stats.newsEvents.totalViews}
-              </div>
-            </div>
-            <h3 className="text-3xl font-bold mb-1">{stats.newsEvents.total}</h3>
-            <p className="text-orange-100">News & Events</p>
-            <div className="mt-4 pt-4 border-t border-white/20 flex justify-between text-sm">
-              <span>News: {stats.newsEvents.news}</span>
-              <span>Events: {stats.newsEvents.events}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-white rounded-2xl border-2 border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Student Growth</h2>
-              <div className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-gray-400" />
-              </div>
-            </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={studentTrendData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="name" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#fff', 
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '12px',
-                    padding: '12px'
-                  }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="students" 
-                  stroke="#9179E0" 
-                  strokeWidth={3}
-                  dot={{ fill: '#9179E0', r: 6 }}
-                  activeDot={{ r: 8 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="bg-white rounded-2xl border-2 border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Course Status</h2>
-              <PieChart className="w-5 h-5 text-gray-400" />
-            </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <RePieChart>
-                <Pie
-                  data={courseDistributionData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent || 0 * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
+    <div className="min-h-screen bg-gray-50 flex">
+      <main className="flex-1 overflow-y-auto">
+        <div className="p-4 md:p-8">
+          <div className="max-w-7xl mx-auto space-y-8">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setSidebarOpen(true)}
+                  className="lg:hidden p-2 hover:bg-white rounded-xl transition-colors"
                 >
-                  {courseDistributionData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </RePieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+                  <Menu className="w-6 h-6 text-gray-700" />
+                </button>
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
+                  <p className="text-gray-600 mt-1">Welcome back! Here's what's happening today.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <button className="p-3 hover:bg-white rounded-xl transition-colors relative">
+                  <Bell className="w-5 h-5 text-gray-700" />
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+                <select
+                  value={timeRange}
+                  onChange={(e) => setTimeRange(e.target.value as any)}
+                  className="px-4 py-2 bg-white border-2 border-gray-200 rounded-xl text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-[#9179E0] cursor-pointer"
+                >
+                  <option value="week">Last 7 days</option>
+                  <option value="month">Last 30 days</option>
+                  <option value="year">Last year</option>
+                </select>
+              </div>
+            </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-white rounded-2xl border-2 border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Quick Actions</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {quickActions.map((action, index) => {
-                const Icon = action.icon;
-                return (
-                  <a
-                    key={index}
-                    href={action.href}
-                    className="group flex items-start gap-4 p-4 rounded-xl border-2 border-gray-200 hover:border-[#9179E0] transition-all hover:shadow-lg"
-                  >
-                    <div className={`${action.color} p-3 rounded-xl text-white`}>
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#9179E0] transition-colors">
-                        {action.title}
-                      </h3>
-                      <p className="text-sm text-gray-600">{action.description}</p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-[#9179E0] transition-colors" />
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl border-2 border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Recent Activity</h2>
-              <Clock className="w-5 h-5 text-gray-400" />
-            </div>
-            <div className="space-y-4">
-              {activities.map((activity) => (
-                <div key={activity.id} className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0">
-                  <div className={`p-2 rounded-lg ${
-                    activity.type === 'student' ? 'bg-purple-100' :
-                    activity.type === 'course' ? 'bg-blue-100' :
-                    activity.type === 'quiz' ? 'bg-green-100' : 'bg-orange-100'
-                  }`}>
-                    {activity.type === 'student' && <UserCheck className="w-4 h-4 text-purple-600" />}
-                    {activity.type === 'course' && <BookOpen className="w-4 h-4 text-blue-600" />}
-                    {activity.type === 'quiz' && <FileText className="w-4 h-4 text-green-600" />}
-                    {activity.type === 'event' && <Calendar className="w-4 h-4 text-orange-600" />}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <Users className="w-6 h-6" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900">{activity.action}</p>
-                    <p className="text-xs text-gray-600">{activity.user}</p>
-                    <p className="text-xs text-gray-400 mt-1">{activity.timestamp}</p>
+                  <div className="flex items-center gap-1 text-sm font-semibold bg-white/20 px-3 py-1 rounded-full">
+                    <TrendingUp className="w-4 h-4" />
+                    {stats.students.growth}%
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
+                <h3 className="text-3xl font-bold mb-1">{stats.students.total}</h3>
+                <p className="text-purple-100">Total Students</p>
+                <div className="mt-4 pt-4 border-t border-white/20 flex justify-between text-sm">
+                  <span>Active: {stats.students.active}</span>
+                  <span>Suspended: {stats.students.suspended}</span>
+                </div>
+              </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-purple-100 rounded-xl">
-                <Star className="w-6 h-6 text-purple-600" />
+              <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <BookOpen className="w-6 h-6" />
+                  </div>
+                  <div className="flex items-center gap-1 text-sm font-semibold bg-white/20 px-3 py-1 rounded-full">
+                    <Activity className="w-4 h-4" />
+                    {stats.courses.published}/{stats.courses.total}
+                  </div>
+                </div>
+                <h3 className="text-3xl font-bold mb-1">{stats.courses.total}</h3>
+                <p className="text-blue-100">Total Courses</p>
+                <div className="mt-4 pt-4 border-t border-white/20 flex justify-between text-sm">
+                  <span>Published: {stats.courses.published}</span>
+                  <span>Weeks: {stats.courses.totalWeeks}</span>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <Award className="w-6 h-6" />
+                  </div>
+                  <div className="flex items-center gap-1 text-sm font-semibold bg-white/20 px-3 py-1 rounded-full">
+                    <TrendingUp className="w-4 h-4" />
+                    {stats.quizzes.averageScore}%
+                  </div>
+                </div>
+                <h3 className="text-3xl font-bold mb-1">{stats.quizzes.total}</h3>
+                <p className="text-green-100">Active Quizzes</p>
+                <div className="mt-4 pt-4 border-t border-white/20 flex justify-between text-sm">
+                  <span>Completed: {stats.quizzes.completed}</span>
+                  <span>Active: {stats.quizzes.active}</span>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 text-white shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <MessageSquare className="w-6 h-6" />
+                  </div>
+                  {stats.contacts.unread > 0 && (
+                    <div className="flex items-center gap-1 text-sm font-semibold bg-red-500 px-3 py-1 rounded-full animate-pulse">
+                      <AlertCircle className="w-4 h-4" />
+                      {stats.contacts.unread} New
+                    </div>
+                  )}
+                </div>
+                <h3 className="text-3xl font-bold mb-1">{stats.contacts.total}</h3>
+                <p className="text-orange-100">Contact Messages</p>
+                <div className="mt-4 pt-4 border-t border-white/20 flex justify-between text-sm">
+                  <span>Unread: {stats.contacts.unread}</span>
+                  <a href="/admin/contacts" className="hover:underline font-semibold">View All →</a>
+                </div>
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-1">{stats.flashcards.total}</h3>
-            <p className="text-gray-600 mb-3">Flashcards</p>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-gray-600">Views:</span>
-              <span className="font-semibold text-gray-900">{stats.flashcards.totalViews}</span>
-            </div>
-          </div>
 
-          <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <Users className="w-6 h-6 text-blue-600" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-lg">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-gray-900">Student Growth</h2>
+                  <BarChart3 className="w-5 h-5 text-gray-400" />
+                </div>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={studentTrendData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="name" stroke="#6b7280" />
+                    <YAxis stroke="#6b7280" />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#fff', 
+                        border: '2px solid #e5e7eb',
+                        borderRadius: '12px',
+                        padding: '12px'
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="students" 
+                      stroke="#9179E0" 
+                      strokeWidth={3}
+                      dot={{ fill: '#9179E0', r: 6 }}
+                      activeDot={{ r: 8 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-lg">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-gray-900">Course Status</h2>
+                  <PieChartIcon className="w-5 h-5 text-gray-400" />
+                </div>
+                <ResponsiveContainer width="100%" height={300}>
+                  <RePieChart>
+                    <Pie
+                      data={courseDistributionData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} ${(percent || 0 * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {courseDistributionData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </RePieChart>
+                </ResponsiveContainer>
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-1">{stats.executives.total}</h3>
-            <p className="text-gray-600 mb-3">Executives</p>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-gray-600">Active:</span>
-              <span className="font-semibold text-gray-900">{stats.executives.active}</span>
-            </div>
-          </div>
 
-          <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-green-100 rounded-xl">
-                <UserCheck className="w-6 h-6 text-green-600" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-lg">
+                <h2 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { title: 'View Contacts', desc: 'Check new messages', icon: MessageSquare, href: '/admin/contacts', color: 'bg-orange-500', badge: stats.contacts.unread },
+                    { title: 'Manage Students', desc: 'View student profiles', icon: Users, href: '/admin/students', color: 'bg-purple-500' },
+                    { title: 'Create Course', desc: 'Add new material', icon: BookOpen, href: '/admin/courses/create', color: 'bg-blue-500' },
+                    { title: 'Add Event', desc: 'Schedule new event', icon: Calendar, href: '/admin/events', color: 'bg-green-500' }
+                  ].map((action, idx) => {
+                    const Icon = action.icon;
+                    return (
+                      <a
+                        key={idx}
+                        href={action.href}
+                        className="group relative flex items-start gap-4 p-4 rounded-xl border-2 border-gray-200 hover:border-[#9179E0] transition-all hover:shadow-lg"
+                      >
+                        {action.badge && action.badge > 0 && (
+                          <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                            {action.badge}
+                          </span>
+                        )}
+                        <div className={`${action.color} p-3 rounded-xl text-white`}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#9179E0] transition-colors">
+                            {action.title}
+                          </h3>
+                          <p className="text-sm text-gray-600">{action.desc}</p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-[#9179E0] transition-colors" />
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-lg">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-gray-900">Recent Activity</h2>
+                  <Clock className="w-5 h-5 text-gray-400" />
+                </div>
+                <div className="space-y-4">
+                  {activities.map((activity) => (
+                    <div key={activity.id} className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0">
+                      <div className={`p-2 rounded-lg ${
+                        activity.type === 'student' ? 'bg-purple-100' :
+                        activity.type === 'course' ? 'bg-blue-100' :
+                        activity.type === 'quiz' ? 'bg-green-100' :
+                        activity.type === 'contact' ? 'bg-orange-100' : 'bg-gray-100'
+                      }`}>
+                        {activity.type === 'student' && <UserCheck className="w-4 h-4 text-purple-600" />}
+                        {activity.type === 'course' && <BookOpen className="w-4 h-4 text-blue-600" />}
+                        {activity.type === 'quiz' && <FileText className="w-4 h-4 text-green-600" />}
+                        {activity.type === 'contact' && <MessageSquare className="w-4 h-4 text-orange-600" />}
+                        {activity.type === 'event' && <Calendar className="w-4 h-4 text-gray-600" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900">{activity.action}</p>
+                        <p className="text-xs text-gray-600">{activity.user}</p>
+                        <p className="text-xs text-gray-400 mt-1">{activity.timestamp}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-1">{stats.lecturers.total}</h3>
-            <p className="text-gray-600 mb-3">Lecturers</p>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-gray-600">Courses:</span>
-              <span className="font-semibold text-gray-900">{stats.lecturers.activeCourses}</span>
-            </div>
-          </div>
 
-          <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-orange-100 rounded-xl">
-                <Award className="w-6 h-6 text-orange-600" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-lg hover:shadow-xl transition-shadow">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-purple-100 rounded-xl">
+                    <Star className="w-6 h-6 text-purple-600" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-1">{stats.flashcards.total}</h3>
+                <p className="text-gray-600 mb-3">Flashcards</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-gray-600">Views:</span>
+                  <span className="font-semibold text-gray-900">{stats.flashcards.totalViews}</span>
+                </div>
               </div>
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-1">{stats.flashcards.masteredCount}</h3>
-            <p className="text-gray-600 mb-3">Mastered Cards</p>
-            <div className="flex items-center gap-2 text-sm">
+
+              <div className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-lg hover:shadow-xl transition-shadow">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-blue-100 rounded-xl">
+                    <Users className="w-6 h-6 text-blue-600" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-1">{stats.executives.total}</h3>
+                <p className="text-gray-600 mb-3">Executives</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-gray-600">Active:</span>
+                  <span className="font-semibold text-gray-900">{stats.executives.active}</span>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-lg hover:shadow-xl transition-shadow">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-green-100 rounded-xl">
+                    <UserCheck className="w-6 h-6 text-green-600" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-1">{stats.lecturers.total}</h3>
+                <p className="text-gray-600 mb-3">Lecturers</p>
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-gray-600">Courses:</span>
+                  <span className="font-semibold text-gray-900">{stats.lecturers.activeCourses}</span>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-lg hover:shadow-xl transition-shadow">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-orange-100 rounded-xl">
+                    <Award className="w-6 h-6 text-orange-600" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-1">{stats.flashcards.masteredCount}</h3>
+                <p className="text-gray-600 mb-3">Mastered Cards</p>
+                <div className="flex items-center gap-2 text-sm">
               <span className="text-gray-600">Rate:</span>
               <span className="font-semibold text-green-600">
                 {((stats.flashcards.masteredCount / stats.flashcards.total) * 100).toFixed(1)}%
@@ -494,6 +501,9 @@ const AdminDashboard = () => {
         </div>
       </div>
     </div>
+    </main>
+    </div>
+
   );
 };
 

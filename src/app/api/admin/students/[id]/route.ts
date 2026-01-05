@@ -46,12 +46,57 @@ export async function PATCH(
     const user = await getUser();
     const body = await request.json();
 
-    const allowedUpdates = ['firstName', 'lastName', 'phoneNumber', 'email'];
+    console.log("📥 Admin updating student with data:", body);
+
+    // Fields that admin can update
+    const allowedUpdates = [
+      'firstName', 
+      'lastName', 
+      'phoneNumber', 
+      'email',
+      'level',
+      'studentType',
+      'matricNumber',
+      'dateOfBirth',
+      'address',
+      'city',
+      'state',
+      'bio'
+    ];
+    
     const updates: any = {};
 
     for (const key of allowedUpdates) {
       if (body[key] !== undefined) {
-        updates[key] = body[key];
+        const value = body[key];
+        
+        // Skip null, undefined, or empty string values
+        if (value === null || value === '' || value === undefined) {
+          continue;
+        }
+        
+        // Handle dateOfBirth specially
+        if (key === 'dateOfBirth') {
+          try {
+            const date = new Date(value);
+            if (!isNaN(date.getTime())) {
+              updates[key] = date;
+            }
+          } catch (error) {
+            console.error('Invalid date format:', value);
+          }
+          continue;
+        }
+        
+        // Handle string fields - trim them
+        if (typeof value === 'string') {
+          const trimmed = value.trim();
+          if (trimmed) {
+            updates[key] = trimmed;
+          }
+        } else {
+          updates[key] = value;
+        }
       }
     }
 
@@ -60,6 +105,8 @@ export async function PATCH(
     }
 
     updates.updatedBy = user?.email || 'admin';
+
+    console.log("✅ Final admin update data:", updates);
 
     const { id } = await params;
 
@@ -73,6 +120,14 @@ export async function PATCH(
       return NextResponse.json({ error: 'Student not found' }, { status: 404 });
     }
 
+    // Check if profile should be marked as completed
+    if (student.level && student.studentType && !student.profileCompleted) {
+      await Student.findByIdAndUpdate(id, { profileCompleted: true });
+      student.profileCompleted = true;
+    }
+
+    console.log("📤 Admin updated student:", student);
+
     return NextResponse.json({
       data: {
         ...student,
@@ -83,7 +138,10 @@ export async function PATCH(
     console.error('PATCH /api/admin/students/[id] error:', error);
 
     if (error.code === 11000) {
-      return NextResponse.json({ error: 'Email already exists' }, { status: 409 });
+      const field = Object.keys(error.keyPattern)[0];
+      return NextResponse.json({ 
+        error: `${field === 'email' ? 'Email' : 'Matric number'} already exists` 
+      }, { status: 409 });
     }
 
     return NextResponse.json({ error: 'Failed to update student' }, { status: 500 });

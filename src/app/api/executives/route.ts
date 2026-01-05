@@ -7,25 +7,47 @@ export async function GET(request: NextRequest) {
     await connectDB();
 
     const { searchParams } = new URL(request.url);
-    const session = searchParams.get('session');
+    const id = searchParams.get('id');      
+    const session = searchParams.get('session'); 
+    if (id) {
+      const executive = await Executive.findOne({
+        _id: id,
+        isActive: true,
+      }).lean();
 
+      if (!executive) {
+        return NextResponse.json(
+          { success: false, message: 'Executive not found' },
+          { status: 404 }
+        );
+      }
+
+      const formattedExecutive = {
+        ...executive,
+        _id: executive._id.toString(),
+      };
+
+      return NextResponse.json(formattedExecutive);
+    }
     const executives = await Executive.find({
-      isActive: true
+      isActive: true,
     })
       .sort({ order: 1 })
       .lean();
 
+    const formattedExecutives = executives.map((exec) => ({
+      ...exec,
+      _id: exec._id.toString(),
+    }));
+
     return NextResponse.json({
       success: true,
-      data: executives.map(exec => ({
-        ...exec,
-        _id: exec._id.toString()
-      })),
+      data: formattedExecutives,
     });
   } catch (error) {
     console.error('GET /api/executives error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch executives' },
+      { success: false, error: 'Failed to fetch executives' },
       { status: 500 }
     );
   }

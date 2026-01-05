@@ -36,20 +36,25 @@ export default function ExploreCoursesClient({ courses }: ExploreCoursesClientPr
   const types = ['All', 'FULL_TIME', 'ICE'];
 
   const filteredCourses = useMemo(() => {
-    return courses.filter(course => {
-      const levelMatch = activeFilter === 'All' || 
-        course.level === activeFilter || 
-        course.level === activeFilter.replace('L', '') ||
-        course.level === `${activeFilter}L` ||
-        `${course.level}L` === activeFilter;
-      
-      const typeMatch = activeTypeFilter === 'All' || 
-        course.studentType === activeTypeFilter ||
-        course.studentType.toUpperCase().replace('-', '_') === activeTypeFilter;
-      
-      return levelMatch && typeMatch;
-    });
-  }, [courses, activeFilter, activeTypeFilter]);
+  return courses.filter(course => {
+    const levelMatch = activeFilter === 'All' || 
+      course.level === activeFilter || 
+      course.level === activeFilter.replace('L', '') ||
+      course.level === `${activeFilter}L` ||
+      `${course.level}L` === activeFilter;
+
+    const normalizedCourseType = course.studentType.toUpperCase().replace(/[\s,-]/g, '_');
+
+    const typeMatch = activeTypeFilter === 'All' ||
+      normalizedCourseType.includes('BOTH') ||
+      (activeTypeFilter === 'FULL_TIME' && 
+        (normalizedCourseType.includes('FULL_TIME') || normalizedCourseType.includes('BOTH'))) ||
+      (activeTypeFilter === 'ICE' && 
+        (normalizedCourseType.includes('ICE') || normalizedCourseType.includes('BOTH')));
+
+    return levelMatch && typeMatch;
+  });
+}, [courses, activeFilter, activeTypeFilter]);
 
   const coursesToDisplay = activeFilter === 'All' && activeTypeFilter === 'All'
     ? filteredCourses.slice(0, displayCount)
@@ -89,9 +94,14 @@ export default function ExploreCoursesClient({ courses }: ExploreCoursesClientPr
   };
 
   const formatStudentType = (type: string): string => {
-    if (type === 'FULL_TIME') return 'Full-time';
-    return type;
-  };
+  const normalized = type.toUpperCase().replace(/[\s,-]/g, '_');
+  
+  if (normalized.includes('BOTH')) return 'Full-time & ICE';
+  if (normalized.includes('FULL_TIME')) return 'Full-time';
+  if (normalized.includes('ICE')) return 'ICE';
+  
+  return type;
+};
 
   return (
     <div className="w-full bg-white py-16 md:py-24 font-inter">

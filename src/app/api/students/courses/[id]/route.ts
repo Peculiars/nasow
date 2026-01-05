@@ -49,27 +49,25 @@ export async function GET(
       );
     }
 
-    const studentLevelNumber = student.level.replace('L', '');
-    const courseLevelNumber = (course.level || '').toString().replace('L', '');
+    // Extract numeric part from both student and course levels
+    const studentLevelNumber = student.level.replace(/\D/g, '');
+    const courseLevelNumber = (course.level || '').toString().replace(/\D/g, '');
 
+    // Check if levels match (comparing numeric parts)
     const levelMatches =
       course.level === student.level ||
       courseLevelNumber === studentLevelNumber ||
       course.level === `${studentLevelNumber}L` ||
-      `${course.level}L` === student.level;
+      course.level === `${studentLevelNumber} Level` ||
+      `${course.level}`.startsWith(studentLevelNumber);
 
-    const map: Record<string, string> = {
-      'Full-time': 'FULL_TIME',
-      FULL_TIME: 'FULL_TIME',
-      ICE: 'ICE',
-    };
+    console.log('Student level:', student.level, '(numeric:', studentLevelNumber, ')');
+    console.log('Course level:', course.level, '(numeric:', courseLevelNumber, ')');
+    console.log('Level matches:', levelMatches);
 
-    const studentType = map[student.studentType] || student.studentType;
-    const courseType = map[course.studentType] || course.studentType;
-
-    if (!levelMatches || studentType !== courseType) {
+    if (!levelMatches) {
       return NextResponse.json(
-        { error: 'This course is not available for your level or student type' },
+        { error: 'This course is not available for your level' },
         { status: 403 }
       );
     }

@@ -1,4 +1,5 @@
-import { Facebook, Instagram, Linkedin, Twitter, Mail, Phone, MapPin, ArrowRight } from "lucide-react";
+import { Instagram, Mail, Phone, MapPin, ArrowRight } from "lucide-react";
+import { PiTiktokLogoLight } from "react-icons/pi";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@/public/assets/logo.svg";
@@ -21,24 +22,22 @@ const Footer = () => {
       { name: "NASOWites of the Week", href: "/nasowite-of-the-week" }
     ],
     resources: [
-      { name: "Academic Calendar", href: "/calendar" },
-      { name: "Student Portal", href: "/portal" },
-      { name: "Library Resources", href: "/library" },
-      { name: "Career Guidance", href: "/career" }
+      { name: "Academic Calendar", href: "/coming-soon" },
+      { name: "Student Portal", href: "https://studentportal.unilag.edu.ng/" },
+      { name: "Library Resources", href: "/coming-soon" },
+      { name: "Career Guidance", href: "/coming-soon" }
     ]
   };
 
   const socialLinks = [
-    { name: "Facebook", icon: Facebook, href: "https://facebook.com/nasows.unilag", color: "hover:bg-blue-600" },
-    { name: "Instagram", icon: Instagram, href: "https://instagram.com/nasows.unilag", color: "hover:bg-pink-600" },
-    { name: "LinkedIn", icon: Linkedin, href: "https://linkedin.com/company/nasows-unilag", color: "hover:bg-blue-700" },
-    { name: "Twitter", icon: Twitter, href: "https://twitter.com/nasows_unilag", color: "hover:bg-blue-400" }
+    { name: "Instagram", icon: Instagram, href: "https://instagram.com/Nasows_unilag", color: "hover:bg-pink-600" },
+    { name: "TikTok", icon: PiTiktokLogoLight, href: "https://www.tiktok.com/@nasows_unilag", color: "hover:bg-blue-400" }
   ];
 
   const contactInfo = [
-    { icon: Mail, text: "info@nasows.unilag.edu.ng", href: "mailto:info@nasows.unilag.edu.ng" },
-    { icon: Phone, text: "+234 801 234 5678", href: "tel:+2348012345678" },
-    { icon: MapPin, text: "Faculty of Social Sciences, UNILAG, Akoka, Lagos", href: "#" }
+    { icon: Mail, text: "unilagnasows@gmail.com", href: "mailto:unilagnasows@gmail.com" },
+    { icon: Phone, text: "+234 814 650 6649", href: "tel:+2348146506649" },
+    { icon: MapPin, text: "Faculty of Social Sciences, UNILAG, Akoka, Lagos", href: "https://maps.app.goo.gl/a6dL4hxwX8gkSFRe7" }
   ];
 
   return (
@@ -179,13 +178,13 @@ const Footer = () => {
               &copy; {new Date().getFullYear()} NASOWS UNILAG. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
-              <Link href="/privacy" className="hover:text-white transition-colors">
+              <Link href="/coming-soon" className="hover:text-white transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="hover:text-white transition-colors">
+              <Link href="/coming-soon" className="hover:text-white transition-colors">
                 Terms of Service
               </Link>
-              <Link href="/sitemap" className="hover:text-white transition-colors">
+              <Link href="/coming-soon" className="hover:text-white transition-colors">
                 Sitemap
               </Link>
             </div>

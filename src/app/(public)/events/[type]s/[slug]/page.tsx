@@ -92,7 +92,7 @@ const NewsEventDetailPage = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Item Not Found</h1>
-        <Link href="/news-events" className="flex items-center gap-2 text-[#9179E0] hover:text-[#7E6BDB] font-semibold">
+        <Link href="/events" className="flex items-center gap-2 text-[#9179E0] hover:text-[#7E6BDB] font-semibold">
           <ArrowLeft className="w-5 h-5" />
           Back to News & Events
         </Link>
@@ -115,7 +115,7 @@ const NewsEventDetailPage = () => {
         
         <div className="absolute inset-0 flex items-end">
           <div className="max-w-5xl mx-auto w-full px-6 lg:px-8 pb-12">
-            <Link href="/news-events" className="inline-flex items-center gap-2 text-white/90 hover:text-white font-semibold mb-6 transition-colors">
+            <Link href="/events" className="inline-flex items-center gap-2 text-white/90 hover:text-white font-semibold mb-6 transition-colors">
               <ArrowLeft className="w-5 h-5" />
               Back to All
             </Link>

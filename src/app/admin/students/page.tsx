@@ -6,7 +6,6 @@ import { Student, StudentFilters, StudentStats, UpdateStudentPayload } from '@/s
 import { showError, showPromise, showSuccess } from '@/src/lib/toast';
 import { exportStudentsToCSV } from '@/src/lib/utils';
 import ToastProvider from '@/src/components/ToastProvider';
-import AdminSidebar from '@/src/features/admin/AdminSidebar';
 import StatsCard from '@/src/features/students/components/StatsCard';
 import StudentsFilters from '@/src/features/students/components/StudentsFilters';
 import BulkActionsToolbar from '@/src/features/students/components/BulkActionsToolbar';
