@@ -82,14 +82,12 @@ const NasowiteOfTheWeekPage = () => {
             <>
               <div className="hidden lg:grid lg:grid-cols-2 gap-0 max-w-8xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border-2 border-gray-100">
                 <div className="relative h-[600px]">
-                  <Image
+                  <img
                     src={currentNasowite.image}
                     alt={currentNasowite.name}
-                    fill
-                    className="object-cover"
-                    sizes="50vw"
+                    className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-[#9179E0]/10" />
+                  <div className="absolute inset-0 bg-purple-600/10" />
                   <div className="absolute top-6 right-6 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
                     Current Week
                   </div>
@@ -101,7 +99,7 @@ const NasowiteOfTheWeekPage = () => {
                       <h2 className="text-3xl font-bold text-gray-900 mb-2">
                         {currentNasowite.name}
                       </h2>
-                      <p className="text-lg text-[#9179E0] font-semibold mb-1">
+                      <p className="text-lg text-purple-600 font-semibold mb-1">
                         {currentNasowite.position}
                       </p>
                       <p className="text-gray-600">{currentNasowite.level}</p>
@@ -114,7 +112,7 @@ const NasowiteOfTheWeekPage = () => {
                     </div>
 
                     <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                      <Calendar className="w-4 h-4 text-[#9179E0]" />
+                      <Calendar className="w-4 h-4 text-purple-600" />
                       <span>{new Date(currentNasowite.weekStartDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(currentNasowite.weekEndDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                     </div>
 
@@ -126,7 +124,7 @@ const NasowiteOfTheWeekPage = () => {
                         <ul className="space-y-2">
                           {currentNasowite.achievements.map((achievement, index) => (
                             <li key={index} className="flex items-start">
-                              <span className="inline-block w-1.5 h-1.5 bg-[#9179E0] rounded-full mt-2 mr-3 flex-shrink-0" />
+                              <span className="inline-block w-1.5 h-1.5 bg-purple-600 rounded-full mt-2 mr-3 flex-shrink-0" />
                               <span className="text-gray-700">{achievement}</span>
                             </li>
                           ))}
@@ -144,7 +142,7 @@ const NasowiteOfTheWeekPage = () => {
                             href={`https://instagram.com/${currentNasowite.socials.instagram.replace('@', '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors"
+                            className="flex items-center gap-3 text-gray-700 hover:text-purple-600 transition-colors"
                           >
                             <Instagram className="w-5 h-5" />
                             <span>{currentNasowite.socials.instagram}</span>
@@ -155,7 +153,7 @@ const NasowiteOfTheWeekPage = () => {
                             href={`https://twitter.com/${currentNasowite.socials.twitter.replace('@', '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors"
+                            className="flex items-center gap-3 text-gray-700 hover:text-purple-600 transition-colors"
                           >
                             <Twitter className="w-5 h-5" />
                             <span>{currentNasowite.socials.twitter}</span>
@@ -166,7 +164,7 @@ const NasowiteOfTheWeekPage = () => {
                             href={`https://linkedin.com/in/${currentNasowite.socials.linkedin}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors"
+                            className="flex items-center gap-3 text-gray-700 hover:text-purple-600 transition-colors"
                           >
                             <Linkedin className="w-5 h-5" />
                             <span>{currentNasowite.socials.linkedin}</span>
@@ -174,7 +172,7 @@ const NasowiteOfTheWeekPage = () => {
                         )}
                         <a
                           href={`mailto:${currentNasowite.socials.email}`}
-                          className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors"
+                          className="flex items-center gap-3 text-gray-700 hover:text-purple-600 transition-colors"
                         >
                           <Mail className="w-5 h-5" />
                           <span>{currentNasowite.socials.email}</span>
@@ -182,7 +180,7 @@ const NasowiteOfTheWeekPage = () => {
                         {currentNasowite.socials.phone && (
                           <a
                             href={`tel:${currentNasowite.socials.phone}`}
-                            className="flex items-center gap-3 text-gray-700 hover:text-[#9179E0] transition-colors"
+                            className="flex items-center gap-3 text-gray-700 hover:text-purple-600 transition-colors"
                           >
                             <Phone className="w-5 h-5" />
                             <span>{currentNasowite.socials.phone}</span>
@@ -196,7 +194,7 @@ const NasowiteOfTheWeekPage = () => {
 
               <div className="lg:hidden max-w-md mx-auto perspective">
                 <div
-                  className="relative w-full h-[500px] cursor-pointer"
+                  className="relative w-full h-[520px] cursor-pointer"
                   style={{ transformStyle: "preserve-3d" }}
                 >
                   <div
@@ -207,24 +205,25 @@ const NasowiteOfTheWeekPage = () => {
                     onClick={() => setIsFlipped(!isFlipped)}
                   >
                     <div
-                      className="absolute inset-0 w-full h-full rounded-3xl shadow-xl overflow-hidden"
+                      className="absolute inset-0 w-full h-full rounded-3xl shadow-xl overflow-hidden bg-white"
                       style={{ backfaceVisibility: "hidden" }}
                     >
-                      <Image
-                        src={currentNasowite.image}
-                        alt={currentNasowite.name}
-                        fill
-                        className="object-contain"
-                        sizes="80vw"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                        Current
+                      <div className="relative h-[380px]">
+                        <img
+                          src={currentNasowite.image}
+                          alt={currentNasowite.name}
+                          className="w-full h-full object-cover object-top"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                        <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                          Current
+                        </div>
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                        <h2 className="text-2xl font-bold mb-1">{currentNasowite.name}</h2>
-                        <p className="text-white/90">{currentNasowite.position}</p>
-                        <p className="text-sm text-white/80 mt-4">Tap to learn more</p>
+                      <div className="p-6 bg-white">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-1">{currentNasowite.name}</h2>
+                        <p className="text-purple-600 font-semibold">{currentNasowite.position}</p>
+                        <p className="text-sm text-gray-600 mt-1">{currentNasowite.level}</p>
+                        <p className="text-sm text-purple-600 mt-4 font-medium">Tap to learn more →</p>
                       </div>
                     </div>
 
@@ -250,7 +249,7 @@ const NasowiteOfTheWeekPage = () => {
                           <h2 className="text-2xl font-bold text-gray-900 mb-2">
                             {currentNasowite.name}
                           </h2>
-                          <p className="text-[#9179E0] font-semibold mb-1">
+                          <p className="text-purple-600 font-semibold mb-1">
                             {currentNasowite.position}
                           </p>
                           <p className="text-gray-600 text-sm">{currentNasowite.level}</p>
@@ -270,7 +269,7 @@ const NasowiteOfTheWeekPage = () => {
                             <ul className="space-y-2">
                               {currentNasowite.achievements.map((achievement, index) => (
                                 <li key={index} className="flex items-start text-sm">
-                                  <span className="inline-block w-1.5 h-1.5 bg-[#9179E0] rounded-full mt-1.5 mr-2 flex-shrink-0" />
+                                  <span className="inline-block w-1.5 h-1.5 bg-purple-600 rounded-full mt-1.5 mr-2 flex-shrink-0" />
                                   <span className="text-gray-700">{achievement}</span>
                                 </li>
                               ))}
@@ -288,7 +287,7 @@ const NasowiteOfTheWeekPage = () => {
                                 href={`https://instagram.com/${currentNasowite.socials.instagram.replace('@', '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#9179E0] transition-colors"
+                                className="flex items-center gap-3 text-sm text-gray-700 hover:text-purple-600 transition-colors"
                               >
                                 <Instagram className="w-4 h-4 flex-shrink-0" />
                                 <span className="truncate">{currentNasowite.socials.instagram}</span>
@@ -299,7 +298,7 @@ const NasowiteOfTheWeekPage = () => {
                                 href={`https://twitter.com/${currentNasowite.socials.twitter.replace('@', '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#9179E0] transition-colors"
+                                className="flex items-center gap-3 text-sm text-gray-700 hover:text-purple-600 transition-colors"
                               >
                                 <Twitter className="w-4 h-4 flex-shrink-0" />
                                 <span className="truncate">{currentNasowite.socials.twitter}</span>
@@ -310,7 +309,7 @@ const NasowiteOfTheWeekPage = () => {
                                 href={`https://linkedin.com/in/${currentNasowite.socials.linkedin}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#9179E0] transition-colors"
+                                className="flex items-center gap-3 text-sm text-gray-700 hover:text-purple-600 transition-colors"
                               >
                                 <Linkedin className="w-4 h-4 flex-shrink-0" />
                                 <span className="truncate">{currentNasowite.socials.linkedin}</span>
@@ -318,7 +317,7 @@ const NasowiteOfTheWeekPage = () => {
                             )}
                             <a
                               href={`mailto:${currentNasowite.socials.email}`}
-                              className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#9179E0] transition-colors"
+                              className="flex items-center gap-3 text-sm text-gray-700 hover:text-purple-600 transition-colors"
                             >
                               <Mail className="w-4 h-4 flex-shrink-0" />
                               <span className="truncate">{currentNasowite.socials.email}</span>
@@ -326,7 +325,7 @@ const NasowiteOfTheWeekPage = () => {
                             {currentNasowite.socials.phone && (
                               <a
                                 href={`tel:${currentNasowite.socials.phone}`}
-                                className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#9179E0] transition-colors"
+                                className="flex items-center gap-3 text-sm text-gray-700 hover:text-purple-600 transition-colors"
                               >
                                 <Phone className="w-4 h-4 flex-shrink-0" />
                                 <span className="truncate">{currentNasowite.socials.phone}</span>
