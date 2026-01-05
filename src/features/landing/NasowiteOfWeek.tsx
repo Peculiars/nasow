@@ -215,7 +215,7 @@ const NasowiteOfTheWeekPage = () => {
                         alt={currentNasowite.name}
                         fill
                         className="object-cover"
-                        sizes="100vw"
+                        sizes="80vw"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                       <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
