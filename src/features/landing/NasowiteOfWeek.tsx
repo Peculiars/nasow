@@ -347,59 +347,6 @@ const NasowiteOfTheWeekPage = () => {
           )}
         </div>
       </section>
-
-      {previousNasowites.length > 0 && (
-        <section className="py-16 bg-gray-50">
-          <div className="px-6 max-w-7xl mx-auto lg:px-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#4a368f] mb-8 text-center md:text-left">
-              Previous Honorees
-            </h2>
-            
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {displayedPrevious.map((nasowite) => (
-                <div key={nasowite._id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="relative h-56">
-                    <Image src={nasowite.image} alt={nasowite.name} fill className="object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute bottom-4 left-4 right-4 text-white">
-                      <h3 className="font-bold text-lg mb-1">{nasowite.name}</h3>
-                      <p className="text-sm text-white/90">{nasowite.position}</p>
-                    </div>
-                  </div>
-                  <div className="p-5">
-                    <p className="text-gray-700 text-sm italic line-clamp-2 mb-3">
-                      "{nasowite.quote}"
-                    </p>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <Calendar className="w-3 h-3" />
-                      <span>{new Date(nasowite.weekStartDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {previousNasowites.length > 6 && (
-              <div className="text-center mt-8">
-                <button
-                  onClick={() => setShowAll(!showAll)}
-                  className="inline-flex items-center gap-2 bg-[#9179E0] text-white px-6 py-3 rounded-xl hover:bg-[#7d64c9] transition-colors"
-                >
-                  {showAll ? (
-                    <>
-                      Show Less <ChevronUp className="w-4 h-4" />
-                    </>
-                  ) : (
-                    <>
-                      View All ({previousNasowites.length}) <ChevronDown className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
     </div>
   );
 };
