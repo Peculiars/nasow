@@ -21,6 +21,7 @@ type CourseFormData = {
   title: string;
   courseCode: string;
   level: string;
+  semester: string;
   studentType: string;
   lecturerName: string;
   coverImage?: { url: string; publicId?: string } | null;
@@ -49,10 +50,16 @@ const ReviewStep: React.FC<{ formData: CourseFormData }> = ({ formData }) => {
             <p className="font-medium text-gray-900">{formData.level} Level</p>
           </div>
           <div>
+            <p className="text-sm text-gray-600">Semester</p>
+            <p className="font-medium text-gray-900">
+              {formData.semester === "FIRST" ? "First Semester" : "Second Semester"}
+            </p>
+          </div>
+          <div>
             <p className="text-sm text-gray-600">Student Type</p>
             <p className="font-medium text-gray-900">{formData.studentType}</p>
           </div>
-          <div className="col-span-2">
+          <div>
             <p className="text-sm text-gray-600">Lecturer</p>
             <p className="font-medium text-gray-900">{formData.lecturerName}</p>
           </div>

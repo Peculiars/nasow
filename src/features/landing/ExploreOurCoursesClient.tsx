@@ -12,6 +12,7 @@ interface Course {
   description: string;
   level: string;
   studentType: string;
+  semester: string;
   image: string;
   students: number;
   duration: string;
@@ -26,6 +27,7 @@ interface ExploreCoursesClientProps {
 export default function ExploreCoursesClient({ courses }: ExploreCoursesClientProps) {
   const [activeFilter, setActiveFilter] = useState('All');
   const [activeTypeFilter, setActiveTypeFilter] = useState('All');
+  const [activeSemesterFilter, setActiveSemesterFilter] = useState('All');
   const [displayCount, setDisplayCount] = useState(8);
 
   const levels = useMemo(() => {
@@ -34,33 +36,37 @@ export default function ExploreCoursesClient({ courses }: ExploreCoursesClientPr
   }, [courses]);
 
   const types = ['All', 'FULL_TIME', 'ICE'];
+  const semesters = ['All', 'FIRST', 'SECOND'];
 
   const filteredCourses = useMemo(() => {
-  return courses.filter(course => {
-    const levelMatch = activeFilter === 'All' || 
-      course.level === activeFilter || 
-      course.level === activeFilter.replace('L', '') ||
-      course.level === `${activeFilter}L` ||
-      `${course.level}L` === activeFilter;
+    return courses.filter(course => {
+      const levelMatch = activeFilter === 'All' || 
+        course.level === activeFilter || 
+        course.level === activeFilter.replace('L', '') ||
+        course.level === `${activeFilter}L` ||
+        `${course.level}L` === activeFilter;
 
-    const normalizedCourseType = course.studentType.toUpperCase().replace(/[\s,-]/g, '_');
+      const normalizedCourseType = course.studentType.toUpperCase().replace(/[\s,-]/g, '_');
 
-    const typeMatch = activeTypeFilter === 'All' ||
-      normalizedCourseType.includes('BOTH') ||
-      (activeTypeFilter === 'FULL_TIME' && 
-        (normalizedCourseType.includes('FULL_TIME') || normalizedCourseType.includes('BOTH'))) ||
-      (activeTypeFilter === 'ICE' && 
-        (normalizedCourseType.includes('ICE') || normalizedCourseType.includes('BOTH')));
+      const typeMatch = activeTypeFilter === 'All' ||
+        normalizedCourseType.includes('BOTH') ||
+        (activeTypeFilter === 'FULL_TIME' && 
+          (normalizedCourseType.includes('FULL_TIME') || normalizedCourseType.includes('BOTH'))) ||
+        (activeTypeFilter === 'ICE' && 
+          (normalizedCourseType.includes('ICE') || normalizedCourseType.includes('BOTH')));
 
-    return levelMatch && typeMatch;
-  });
-}, [courses, activeFilter, activeTypeFilter]);
+      const semesterMatch = activeSemesterFilter === 'All' || 
+        course.semester?.toUpperCase() === activeSemesterFilter;
 
-  const coursesToDisplay = activeFilter === 'All' && activeTypeFilter === 'All'
+      return levelMatch && typeMatch && semesterMatch;
+    });
+  }, [courses, activeFilter, activeTypeFilter, activeSemesterFilter]);
+
+  const coursesToDisplay = activeFilter === 'All' && activeTypeFilter === 'All' && activeSemesterFilter === 'All'
     ? filteredCourses.slice(0, displayCount)
     : filteredCourses;
 
-  const hasMoreCourses = activeFilter === 'All' && activeTypeFilter === 'All' && displayCount < filteredCourses.length;
+  const hasMoreCourses = activeFilter === 'All' && activeTypeFilter === 'All' && activeSemesterFilter === 'All' && displayCount < filteredCourses.length;
 
   const handleShowMore = () => {
     setDisplayCount(prev => prev + 8);
@@ -73,6 +79,11 @@ export default function ExploreCoursesClient({ courses }: ExploreCoursesClientPr
 
   const handleTypeFilterChange = (type: string) => {
     setActiveTypeFilter(type);
+    setDisplayCount(8);
+  };
+
+  const handleSemesterFilterChange = (semester: string) => {
+    setActiveSemesterFilter(semester);
     setDisplayCount(8);
   };
 
@@ -94,14 +105,19 @@ export default function ExploreCoursesClient({ courses }: ExploreCoursesClientPr
   };
 
   const formatStudentType = (type: string): string => {
-  const normalized = type.toUpperCase().replace(/[\s,-]/g, '_');
-  
-  if (normalized.includes('BOTH')) return 'Full-time & ICE';
-  if (normalized.includes('FULL_TIME')) return 'Full-time';
-  if (normalized.includes('ICE')) return 'ICE';
-  
-  return type;
-};
+    const normalized = type.toUpperCase().replace(/[\s,-]/g, '_');
+    
+    if (normalized.includes('BOTH')) return 'Full-time & ICE';
+    if (normalized.includes('FULL_TIME')) return 'Full-time';
+    if (normalized.includes('ICE')) return 'ICE';
+    
+    return type;
+  };
+
+  const formatSemester = (semester: string): string => {
+    if (semester === 'All') return semester;
+    return semester.charAt(0) + semester.slice(1).toLowerCase() + ' Semester';
+  };
 
   return (
     <div className="w-full bg-white py-16 md:py-24 font-inter">
@@ -118,55 +134,94 @@ export default function ExploreCoursesClient({ courses }: ExploreCoursesClientPr
           </p>
         </div>
 
-        <div className="mb-6">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Filter by Level</h3>
-          <div className="flex flex-wrap gap-3">
-            {levels.map((filter) => (
-              <button
-                key={filter}
-                onClick={() => handleFilterChange(filter)}
-                className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ${
-                  activeFilter === filter
-                    ? 'bg-[#9179E0] text-white shadow-lg scale-105'
-                    : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-[#9179E0]/30 hover:bg-gray-50'
-                }`}
-              >
-                {filter === 'All' ? filter : formatLevel(filter)}
-              </button>
-            ))}
+        <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 md:p-8 mb-10 border border-purple-100">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="w-1 h-6 bg-[#9179E0] rounded-full"></div>
+            <h3 className="text-lg font-bold text-[#4a368f]">Filter Courses</h3>
           </div>
-        </div>
 
-        <div className="mb-10">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Filter by Student Type</h3>
-          <div className="flex flex-wrap gap-3">
-            {types.map((type) => (
-              <button
-                key={type}
-                onClick={() => handleTypeFilterChange(type)}
-                className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ${
-                  activeTypeFilter === type
-                    ? 'bg-[#9179E0] text-white shadow-lg scale-105'
-                    : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-[#9179E0]/30 hover:bg-gray-50'
-                }`}
-              >
-                {type === 'All' ? type : formatStudentType(type)}
-              </button>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Level Filter */}
+            <div>
+              <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-3 block">
+                Level
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {levels.map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => handleFilterChange(filter)}
+                    className={`px-4 py-2 rounded-lg font-medium text-xs transition-all duration-300 ${
+                      activeFilter === filter
+                        ? 'bg-[#9179E0] text-white shadow-md'
+                        : 'bg-white text-gray-700 border border-gray-200 hover:border-[#9179E0]/40 hover:bg-purple-50'
+                    }`}
+                  >
+                    {filter === 'All' ? filter : formatLevel(filter)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Student Type Filter */}
+            <div>
+              <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-3 block">
+                Student Type
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {types.map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => handleTypeFilterChange(type)}
+                    className={`px-4 py-2 rounded-lg font-medium text-xs transition-all duration-300 ${
+                      activeTypeFilter === type
+                        ? 'bg-[#9179E0] text-white shadow-md'
+                        : 'bg-white text-gray-700 border border-gray-200 hover:border-[#9179E0]/40 hover:bg-purple-50'
+                    }`}
+                  >
+                    {type === 'All' ? type : formatStudentType(type)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Semester Filter */}
+            <div>
+              <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-3 block">
+                Semester
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {semesters.map((semester) => (
+                  <button
+                    key={semester}
+                    onClick={() => handleSemesterFilterChange(semester)}
+                    className={`px-4 py-2 rounded-lg font-medium text-xs transition-all duration-300 ${
+                      activeSemesterFilter === semester
+                        ? 'bg-[#9179E0] text-white shadow-md'
+                        : 'bg-white text-gray-700 border border-gray-200 hover:border-[#9179E0]/40 hover:bg-purple-50'
+                    }`}
+                  >
+                    {formatSemester(semester)}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
         <div className="mb-8">
           <p className="text-gray-600">
             Showing <span className="font-bold text-[#4a368f]">{coursesToDisplay.length}</span> 
-            {(activeFilter === 'All' && activeTypeFilter === 'All') && filteredCourses.length > coursesToDisplay.length && (
+            {(activeFilter === 'All' && activeTypeFilter === 'All' && activeSemesterFilter === 'All') && filteredCourses.length > coursesToDisplay.length && (
               <> of <span className="font-bold text-[#4a368f]">{filteredCourses.length}</span></>
             )} course{coursesToDisplay.length !== 1 ? 's' : ''}
-            {(activeFilter !== 'All' || activeTypeFilter !== 'All') && (
+            {(activeFilter !== 'All' || activeTypeFilter !== 'All' || activeSemesterFilter !== 'All') && (
               <span className="text-sm ml-2">
                 ({activeFilter !== 'All' && formatLevel(activeFilter)}
-                {activeFilter !== 'All' && activeTypeFilter !== 'All' && ' • '}
-                {activeTypeFilter !== 'All' && formatStudentType(activeTypeFilter)})
+                {activeFilter !== 'All' && (activeTypeFilter !== 'All' || activeSemesterFilter !== 'All') && ' • '}
+                {activeTypeFilter !== 'All' && formatStudentType(activeTypeFilter)}
+                {activeTypeFilter !== 'All' && activeSemesterFilter !== 'All' && ' • '}
+                {activeSemesterFilter !== 'All' && formatSemester(activeSemesterFilter)})
               </span>
             )}
           </p>
@@ -251,7 +306,7 @@ export default function ExploreCoursesClient({ courses }: ExploreCoursesClientPr
             <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-600 text-lg font-medium">No courses found</p>
             <p className="text-gray-500 text-sm mt-2">
-              {activeFilter === 'All' && activeTypeFilter === 'All' 
+              {activeFilter === 'All' && activeTypeFilter === 'All' && activeSemesterFilter === 'All'
                 ? 'No published courses available yet'
                 : 'Try selecting different filters'}
             </p>

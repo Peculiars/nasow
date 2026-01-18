@@ -19,12 +19,14 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const level = searchParams.get('level');
+    const semester = searchParams.get('semester');
     const studentType = searchParams.get('studentType');
     const status = searchParams.get('status');
     const search = searchParams.get('search');
 
     const filter: any = {};
     if (level) filter.level = level;
+    if (semester) filter.semester = semester;
     if (studentType) filter.studentType = studentType;
     if (status) filter.status = status;
     if (search) {
@@ -39,10 +41,16 @@ export async function GET(request: NextRequest) {
       .sort({ createdAt: -1 })
       .lean();
 
+    // Ensure all courses have semester field (default to FIRST for backward compatibility)
+    const coursesWithSemester = courses.map(course => ({
+      ...course,
+      semester: course.semester || 'FIRST'
+    }));
+
     return NextResponse.json({
       success: true,
-      data: courses,
-      count: courses.length
+      data: coursesWithSemester,
+      count: coursesWithSemester.length
     });
   } catch (error) {
     console.error('❌ GET /api/admin/courses error:', error);
@@ -73,6 +81,7 @@ export async function POST(request: NextRequest) {
       'title',
       'courseCode',
       'level',
+      'semester',
       'studentType',
       'lecturerName',
       'coverImage'
@@ -89,6 +98,7 @@ export async function POST(request: NextRequest) {
 
     const course = await Course.create({
       ...body,
+      semester: body.semester || 'FIRST',
       createdBy: user?.id,
       weeks: body.weeks || []
     });

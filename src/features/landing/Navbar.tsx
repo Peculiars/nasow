@@ -5,10 +5,12 @@ import { MoveRight, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@/public/assets/logo.svg";
+import unilagLogo from "@/public/assets/unilag-logo.png";
 
 const navItems = [
+  { id: "1", name: "Home", url: "/" },
   {
-    id: "1",
+    id: "2",
     name: "About",
     url: "/about",
     dropdown: [
@@ -17,7 +19,7 @@ const navItems = [
     ],
   },
   {
-    id: "2",
+    id: "3",
     name: "Executives",
     url: "/executives",
     dropdown: [
@@ -27,7 +29,7 @@ const navItems = [
     ],
   },
   {
-    id: "3",
+    id: "4",
     name: "Academics",
     url: "/portal/courses",
     dropdown: [
@@ -37,7 +39,7 @@ const navItems = [
     ],
   },
   {
-    id: "4",
+    id: "5",
     name: "Community",
     url: "/events",
     dropdown: [
@@ -47,7 +49,7 @@ const navItems = [
       // { name: "Photo Gallery", url: "/gallery" },
     ],
   },
-  { id: "5", name: "Contact Us", url: "/contact" },
+  { id: "6", name: "Contact Us", url: "/contact" },
 ];
 
 const Navbar = () => {
@@ -65,18 +67,28 @@ const Navbar = () => {
     <nav className="bg-white/90 backdrop-blur-xl shadow-md sticky top-0 z-50 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link href="/" className="group">
-            <Image
-              src={logo}
-              alt="NASOWS UNILAG Chapter"
-              width={120}
-              height={120}
-              priority
-              className="h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
-            />
-          </Link>
-
+          <div className="flex items-center space-x-2">
+            <Link href="/" className="group">
+              <Image
+                src={unilagLogo}
+                alt="UNILAG logo"
+                width={120}
+                height={120}
+                priority
+                className="h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              />
+            </Link>
+            <Link href="/" className="group">
+              <Image
+                src={logo}
+                alt="NASOWS UNILAG Chapter"
+                width={120}
+                height={120}
+                priority
+                className="h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              />
+            </Link>
+          </div>
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center space-x-8">
             {navItems.map((item) => (

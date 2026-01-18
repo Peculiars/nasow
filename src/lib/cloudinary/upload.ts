@@ -28,8 +28,8 @@ export async function uploadCourseImage(
         {
           folder: 'nasows/courses/covers',
           resource_type: 'image',
-          type: 'upload', // Make it public
-          access_mode: 'public', // Ensure public access
+          type: 'upload', 
+          access_mode: 'public',
           transformation: [
             { quality: 'auto:good' },
             { fetch_format: 'auto' }

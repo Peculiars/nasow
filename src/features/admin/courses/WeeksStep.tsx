@@ -22,6 +22,7 @@ type CourseFormData = {
   title: string;
   courseCode: string;
   level: string;
+  semester: string;
   studentType: string;
   lecturerName: string;
   coverImage?: { url: string; publicId?: string } | null;

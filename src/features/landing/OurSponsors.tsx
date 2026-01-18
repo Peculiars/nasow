@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { ArrowRight, Award, Heart, Handshake, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { SponsorCardSkeleton } from './SkeletonLoader';
 
 interface Sponsor {
   _id: string;
@@ -86,16 +87,9 @@ const OurSponsors = () => {
   };
 
   if (isLoading) {
-    return (
-      <section className="py-16 md:py-24 bg-gradient-to-b from-white to-gray-50 font-inter w-full">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-[#9179E0]" />
-          </div>
-        </div>
-      </section>
-    );
+    return <SponsorCardSkeleton />
   }
+
 
   const hasSponsors = sponsors.platinum.length > 0 || sponsors.gold.length > 0 || sponsors.silver.length > 0;
 
@@ -330,7 +324,7 @@ const OurSponsors = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-[#4a368f] to-[#9179E0] rounded-3xl p-8 md:p-12">
+        {/* <div className="bg-gradient-to-r from-[#4a368f] to-[#9179E0] rounded-3xl p-8 md:p-12">
           <h3 className="text-2xl md:text-3xl font-bold text-white text-center mb-8">
             Our Impact Together
           </h3>
@@ -360,7 +354,7 @@ const OurSponsors = () => {
               <p className="text-white/80 text-sm">Students Impacted</p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );

@@ -1,13 +1,31 @@
 import React, { useRef, useState } from "react";
 
+type Material = {
+  name: string;
+  url: string;
+  publicId?: string;
+  fileType?: string;
+  fileSize?: number;
+};
+
+type Week = {
+  weekNumber: number;
+  title: string;
+  content?: string;
+  materials: Material[];
+  order?: number;
+  isPublished?: boolean;
+};
+
 type CourseFormData = {
   title: string;
   courseCode: string;
   level: string;
+  semester: string;
   studentType: string;
   lecturerName: string;
   coverImage?: { url: string; publicId?: string } | null;
-  weeks: any[];
+  weeks: Week[];
   status?: string;
 };
 
@@ -95,6 +113,18 @@ const BasicInfoStep: React.FC<{
         </div>
 
         <div>
+          <label className="block text-sm font-bold text-gray-700 mb-2">Semester *</label>
+          <select
+            value={formData.semester || "FIRST"}
+            onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
+            className="w-full px-4 py-3 border-2 border-gray-300 placeholder:text-gray-500 text-gray-700 cursor-pointer rounded-xl focus:border-[#9179E0] focus:outline-none"
+          >
+            <option value="FIRST">First Semester</option>
+            <option value="SECOND">Second Semester</option>
+          </select>
+        </div>
+
+        <div>
           <label className="block text-sm font-bold text-gray-700 mb-2">Student Type *</label>
           <select
             value={formData.studentType}
@@ -108,7 +138,7 @@ const BasicInfoStep: React.FC<{
           </select>
         </div>
 
-        <div className="md:col-span-2">
+        <div>
           <label className="block text-sm font-bold text-gray-700 mb-2">Lecturer Name *</label>
           <input
             type="text"

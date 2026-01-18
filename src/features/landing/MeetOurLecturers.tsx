@@ -11,7 +11,6 @@ async function getLecturers() {
 
     if (!res.ok) return [];
     const data = await res.json();
-    // Only return the first 3 lecturers
     return data.slice(0, 3);
   } catch (error) {
     console.error('Error fetching lecturers:', error);
@@ -57,7 +56,6 @@ export default async function MeetOurLecturers() {
           </p>
         </div>
 
-        {/* Changed to lg:grid-cols-3 for better spacing with only 3 items */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {lecturers.map((lecturer: any) => (
             <div

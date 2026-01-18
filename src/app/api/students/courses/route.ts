@@ -45,43 +45,20 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
 
-    // Extract just the numeric part (100, 200, 300, etc.)
-    // Extract just the numeric part (100, 200, 300, etc.)
-    const levelNumber = student.level.replace(/\D/g, ''); // Remove all non-digits
-
-    // Build the base filter with proper $and structure
+    // Build the filter - only status and optional search
     const filter: any = {
-      $and: [
-        // Level matching - matches "100L", "100 Level", "100", etc.
-        {
-          $or: [
-            { level: student.level },
-            { level: levelNumber },
-            { level: `${levelNumber}L` },
-            { level: `${levelNumber} Level` },
-            { level: { $regex: `^${levelNumber}`, $options: 'i' } } // Matches anything starting with the number
-          ]
-        },
-        // Status matching
-        {
-          status: { $in: ['published', 'PUBLISHED'] }
-        }
-      ]
+      status: { $in: ['published', 'PUBLISHED'] }
     };
 
     // Add search filter if provided
     if (search) {
-      filter.$and.push({
-        $or: [
-          { title: { $regex: search, $options: 'i' } },
-          { courseCode: { $regex: search, $options: 'i' } },
-          { lecturerName: { $regex: search, $options: 'i' } }
-        ]
-      });
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { courseCode: { $regex: search, $options: 'i' } },
+        { lecturerName: { $regex: search, $options: 'i' } }
+      ];
     }
 
-    console.log('Student level:', student.level);
-    console.log('Level number:', levelNumber);
     console.log('Query filter:', JSON.stringify(filter, null, 2));
 
     const courses = await Course.find(filter)
@@ -89,11 +66,6 @@ export async function GET(request: NextRequest) {
       .lean();
 
     console.log('Courses found:', courses.length);
-    
-    // Additional debugging: log the levels of found courses
-    if (courses.length > 0) {
-      console.log('Course levels found:', courses.map(c => ({ title: c.title, level: c.level })));
-    }
 
     return NextResponse.json({
       success: true,

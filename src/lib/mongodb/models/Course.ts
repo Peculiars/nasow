@@ -19,6 +19,11 @@ export enum Level {
   L500 = '500'
 }
 
+export enum Semester {
+  FIRST = 'FIRST',
+  SECOND = 'SECOND'
+}
+
 interface ICourseMaterial {
   name: string;
   url: string;
@@ -41,6 +46,7 @@ export interface ICourse extends Document {
   title: string;
   courseCode: string;
   level: Level;
+  semester: Semester;
   studentType: StudentType;
   lecturerName: string;
   description: string;
@@ -54,7 +60,6 @@ export interface ICourse extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
-
 
 const CourseMaterialSchema = new Schema<ICourseMaterial>({
   name: { type: String, required: true },
@@ -94,6 +99,12 @@ const CourseSchema = new Schema<ICourse>(
       enum: Object.values(Level),
       required: [true, 'Level is required']
     },
+    semester: {
+      type: String,
+      enum: Object.values(Semester),
+      default: Semester.FIRST,
+      required: [true, 'Semester is required']
+    },
     studentType: {
       type: String,
       enum: Object.values(StudentType),
@@ -128,7 +139,7 @@ const CourseSchema = new Schema<ICourse>(
   }
 );
 
-CourseSchema.index({ level: 1, studentType: 1 });
+CourseSchema.index({ level: 1, studentType: 1, semester: 1 });
 CourseSchema.index({ status: 1 });
 CourseSchema.index({ courseCode: 1 });
 CourseSchema.index({ createdBy: 1 });

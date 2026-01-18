@@ -1,8 +1,8 @@
 "use client"
 import { useState, useEffect } from "react";
 import { BookOpen, Target, Brain, Award, ArrowRight } from "lucide-react";
+import { FlashcardSkeleton } from "./SkeletonLoader";
 
-// Types
 interface SampleCard {
   _id: string;
   category: string;
@@ -109,7 +109,7 @@ const FlashcardsLanding = () => {
           <div className="order-2 lg:order-1">
             {loading ? (
               <div className="flex justify-center items-center py-12">
-                <div className="w-12 h-12 border-4 border-[#9179E0] border-t-transparent rounded-full animate-spin"></div>
+                <FlashcardSkeleton />
               </div>
             ) : sampleCards.length === 0 ? (
               <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-gray-200">

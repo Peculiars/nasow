@@ -1,6 +1,18 @@
 import { connectDB } from "@/src/lib/mongodb/connection";
 import Course from "@/src/lib/mongodb/models/Course";
 import ExploreCoursesClient from "./ExploreOurCoursesClient";
+import { Suspense } from "react";
+import { CourseCardSkeleton } from "./SkeletonLoader";
+
+function CoursesSkeletonGrid() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <CourseCardSkeleton key={i} />
+      ))}
+    </div>
+  );
+}
 
 async function getCourses() {
   try {
@@ -18,6 +30,7 @@ async function getCourses() {
       title: course.title,
       description: course.description || 'No description available',
       level: course.level,
+      semester: course.semester,
       studentType: course.studentType,
       image: course.coverImage?.url || '/assets/placeholder-course.png',
       students: 0,
@@ -34,5 +47,9 @@ async function getCourses() {
 export default async function ExploreOurCourses() {
   const courses = await getCourses();
 
-  return <ExploreCoursesClient courses={courses} />;
+  return (
+    <Suspense fallback={<CoursesSkeletonGrid />}>
+      <ExploreCoursesClient courses={courses} />
+    </Suspense>
+  );
 }

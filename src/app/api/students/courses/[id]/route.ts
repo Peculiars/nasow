@@ -49,29 +49,7 @@ export async function GET(
       );
     }
 
-    // Extract numeric part from both student and course levels
-    const studentLevelNumber = student.level.replace(/\D/g, '');
-    const courseLevelNumber = (course.level || '').toString().replace(/\D/g, '');
-
-    // Check if levels match (comparing numeric parts)
-    const levelMatches =
-      course.level === student.level ||
-      courseLevelNumber === studentLevelNumber ||
-      course.level === `${studentLevelNumber}L` ||
-      course.level === `${studentLevelNumber} Level` ||
-      `${course.level}`.startsWith(studentLevelNumber);
-
-    console.log('Student level:', student.level, '(numeric:', studentLevelNumber, ')');
-    console.log('Course level:', course.level, '(numeric:', courseLevelNumber, ')');
-    console.log('Level matches:', levelMatches);
-
-    if (!levelMatches) {
-      return NextResponse.json(
-        { error: 'This course is not available for your level' },
-        { status: 403 }
-      );
-    }
-
+    // No level or student type filtering - all students can access all published courses
     return NextResponse.json({ success: true, data: course });
   } catch (error) {
     console.error('GET /api/students/courses/[id] error:', error);

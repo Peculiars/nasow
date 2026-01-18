@@ -238,7 +238,7 @@ const UpcomingNewsAndEvents = () => {
 
         <div className="text-center mb-16">
           <Link
-            href="/news-events"
+            href="/events"
             className="inline-flex items-center gap-3 px-8 py-4 bg-[#9179E0] hover:bg-[#7E6BDB] text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
           >
             View All Events & News
@@ -246,37 +246,6 @@ const UpcomingNewsAndEvents = () => {
           </Link>
         </div>
 
-        <div className="bg-gradient-to-br from-[#4a368f] to-[#9179E0] rounded-3xl p-8 md:p-12 text-white">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="flex-1 text-center md:text-left">
-                <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                  Don't Miss Out on Any Event!
-                </h3>
-                <p className="text-lg text-white/90 leading-relaxed mb-6">
-                  Subscribe to our newsletter and get notified about upcoming events, news, and important announcements from NASOWS UNILAG.
-                </p>
-                <Link
-                  href="/subscribe"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#4a368f] rounded-lg font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105"
-                >
-                  Subscribe Now
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-              <div className="flex flex-col gap-4">
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
-                  <p className="text-3xl font-bold mb-1">{events.length}+</p>
-                  <p className="text-sm text-white/80">Recent Updates</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
-                  <p className="text-3xl font-bold mb-1">{events.reduce((acc, e) => acc + (e.views || 0), 0)}+</p>
-                  <p className="text-sm text-white/80">Total Views</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );

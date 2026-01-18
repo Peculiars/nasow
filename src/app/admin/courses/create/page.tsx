@@ -25,6 +25,7 @@ type CourseFormData = {
   title: string;
   courseCode: string;
   level: string;
+  semester: string;
   studentType: string;
   lecturerName: string;
   coverImage?: { url: string; publicId?: string } | null;
@@ -39,6 +40,7 @@ const CreateCoursePage: React.FC = () => {
     title: "",
     courseCode: "",
     level: "",
+    semester: "FIRST",
     studentType: "",
     lecturerName: "",
     coverImage: null,
@@ -107,11 +109,15 @@ const CreateCoursePage: React.FC = () => {
 
         <div className="bg-white rounded-2xl border-2 border-gray-200 text-gray-700 p-6 mb-6">
           <div className="flex items-center justify-between">
-            {{
-              1: "Basic Info",
-              2: "Add Weeks",
-              3: "Review"
-            }[step]}
+            <span className="font-bold">
+              Step {step} of 3: {
+                {
+                  1: "Basic Info",
+                  2: "Add Weeks",
+                  3: "Review"
+                }[step]
+              }
+            </span>
           </div>
         </div>
 
@@ -120,6 +126,7 @@ const CreateCoursePage: React.FC = () => {
           {step === 2 && <WeeksStep formData={formData} setFormData={setFormData} />}
           {step === 3 && <ReviewStep formData={formData} />}
         </div>
+
         <div className="flex items-center justify-between mt-6">
           <button
             onClick={() => window.location.href = "/admin/courses"}

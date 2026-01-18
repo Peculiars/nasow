@@ -26,6 +26,7 @@ type CourseFormData = {
   title: string;
   courseCode: string;
   level: string;
+  semester: string;
   studentType: string;
   lecturerName: string;
   coverImage?: { url: string; publicId?: string } | null;
@@ -45,6 +46,7 @@ const EditCoursePage: React.FC = () => {
     title: "",
     courseCode: "",
     level: "",
+    semester: "FIRST",
     studentType: "",
     lecturerName: "",
     coverImage: null,
@@ -63,7 +65,10 @@ const EditCoursePage: React.FC = () => {
       const data = await response.json();
 
       if (data.success) {
-        setFormData(data.data);
+        setFormData({
+          ...data.data,
+          semester: data.data.semester || "FIRST"
+        });
       } else {
         alert("Failed to fetch course");
         router.push("/admin/courses");

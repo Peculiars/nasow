@@ -16,6 +16,7 @@ import {
   Loader,
 } from "lucide-react"
 import Link from "next/link"
+import { QuizCardSkeleton } from "./SkeletonLoader"
 
 interface Quiz {
   _id: string
@@ -143,22 +144,13 @@ const QuizLanding = () => {
   }
 
   if (loading) {
-    return (
-      <section className="py-16 md:py-24 bg-white w-full font-inter">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-center min-h-96">
-          <div className="flex flex-col items-center gap-4">
-            <Loader className="w-8 h-8 text-[#9179E0] animate-spin" />
-            <p className="text-gray-600">Loading quizzes...</p>
-          </div>
-        </div>
-      </section>
-    )
-  }
+  return <QuizCardSkeleton />
+}
+
 
   return (
     <section className="py-16 md:py-24 bg-white w-full font-inter">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Header */}
         <div className="text-center md:text-left mb-12">
           <div className="flex flex-col md:flex-row md:items-baseline md:space-x-3 mb-4">
             <div className="hidden md:block size-6 bg-green-500" />

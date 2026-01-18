@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Instagram, Twitter, Linkedin, Mail, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { NasowiteCardSkeleton } from "./SkeletonLoader";
 
 interface Nasowite {
   _id: string;
@@ -45,15 +46,7 @@ const NasowiteOfWeek = () => {
   };
 
   if (loading) {
-    return (
-      <section className="py-16 md:py-24 bg-gray-50 font-inter w-full">
-        <div className="px-6 max-w-7xl mx-auto lg:px-8">
-          <div className="flex items-center justify-center h-96">
-            <div className="w-12 h-12 border-4 border-[#9179E0] border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        </div>
-      </section>
-    );
+    return <NasowiteCardSkeleton />;
   }
 
   if (!nasowite) {

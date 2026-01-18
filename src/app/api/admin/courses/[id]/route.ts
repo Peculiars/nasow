@@ -31,9 +31,15 @@ export async function GET(
       );
     }
 
+    // Ensure backward compatibility with semester field
+    const courseWithSemester = {
+      ...course,
+      semester: course.semester || 'FIRST'
+    };
+
     return NextResponse.json({
       success: true,
-      data: course
+      data: courseWithSemester
     });
   } catch (error) {
     console.error('❌ GET /api/admin/courses/[id] error:', error);
@@ -43,7 +49,6 @@ export async function GET(
     );
   }
 }
-
 
 export async function PATCH(
   request: NextRequest,
@@ -77,10 +82,15 @@ export async function PATCH(
       await deleteFromCloudinary(existingCourse.coverImage.publicId, 'image');
     }
 
+    // Ensure semester is set (default to FIRST for backward compatibility)
+    const updateData = {
+      ...body,
+      semester: body.semester || 'FIRST'
+    };
 
     const updatedCourse = await Course.findByIdAndUpdate(
       id,
-      { $set: body },
+      { $set: updateData },
       { new: true, runValidators: true }
     );
 

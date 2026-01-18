@@ -4,10 +4,10 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 const CoursesPage = () => {
-    const router = useRouter();
+  const router = useRouter();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState({ level: "", studentType: "", status: "", search: "" });
+  const [filter, setFilter] = useState({ level: "", semester: "", studentType: "", status: "", search: "" });
 
   useEffect(() => {
     fetchCourses();
@@ -18,6 +18,7 @@ const CoursesPage = () => {
       setLoading(true);
       const params = new URLSearchParams();
       if (filter.level) params.append("level", filter.level);
+      if (filter.semester) params.append("semester", filter.semester);
       if (filter.studentType) params.append("studentType", filter.studentType);
       if (filter.status) params.append("status", filter.status);
       if (filter.search) params.append("search", filter.search);
@@ -34,8 +35,6 @@ const CoursesPage = () => {
       setLoading(false);
     }
   };
-
-  console.log("Courses:", courses);
 
   const deleteCourse = async (id: string) => {
     if (!confirm("Are you sure you want to delete this course? This action cannot be undone.")) {
@@ -58,10 +57,13 @@ const CoursesPage = () => {
     }
   };
 
+  console.log('filter:', filter)
+  console.log('courses:', courses)
+
   return (
     <div className="md:p-8 p-4 font-inter bg-slate-50">
       <div className="max-w-7xl mx-auto">
-        <div className="flex md:flex-row flex-col  md:items-center items-start space-y-3 md:space-y-0 justify-between mb-8">
+        <div className="flex md:flex-row flex-col md:items-center items-start space-y-3 md:space-y-0 justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Courses</h1>
             <p className="text-gray-600 mt-1">Manage all course materials and content</p>
@@ -76,7 +78,7 @@ const CoursesPage = () => {
         </div>
 
         <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Search</label>
               <input
@@ -95,12 +97,25 @@ const CoursesPage = () => {
                 onChange={(e) => setFilter({ ...filter, level: e.target.value })}
                 className="w-full cursor-pointer px-4 py-2 border-2 placeholder:text-gray-500 text-gray-700 border-gray-300 rounded-xl focus:border-[#9179E0] focus:outline-none"
               >
-                <option className="cursor-pointer" value="">All Levels</option>
-                <option className="cursor-pointer" value="100">100 Level</option>
-                <option className="cursor-pointer" value="200">200 Level</option>
-                <option className="cursor-pointer" value="300">300 Level</option>
-                <option className="cursor-pointer" value="400">400 Level</option>
-                <option className="cursor-pointer" value="500">500 Level</option>
+                <option value="">All Levels</option>
+                <option value="100">100 Level</option>
+                <option value="200">200 Level</option>
+                <option value="300">300 Level</option>
+                <option value="400">400 Level</option>
+                <option value="500">500 Level</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">Semester</label>
+              <select
+                value={filter.semester}
+                onChange={(e) => setFilter({ ...filter, semester: e.target.value })}
+                className="w-full cursor-pointer px-4 py-2 border-2 placeholder:text-gray-500 text-gray-700 border-gray-300 rounded-xl focus:border-[#9179E0] focus:outline-none"
+              >
+                <option value="">All Semesters</option>
+                <option value="FIRST">First Semester</option>
+                <option value="SECOND">Second Semester</option>
               </select>
             </div>
 
@@ -157,6 +172,7 @@ const CoursesPage = () => {
             </p>
           </div>
         </div>
+
         {loading ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#9179E0] border-t-transparent"></div>
@@ -181,9 +197,12 @@ const CoursesPage = () => {
                   </span>
                 </div>
                 <div className="p-6">
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
                     <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded">
                       {course.level}L
+                    </span>
+                    <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded">
+                      {course.semester === "FIRST" ? "Sem 1" : "Sem 2"}
                     </span>
                     <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded">
                       {course.studentType === "FULL_TIME" ? "FT" : course.studentType === "ICE" ? "ICE" : "Both"}
@@ -191,7 +210,7 @@ const CoursesPage = () => {
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">{course.title}</h3>
                   <p className="text-sm text-gray-600 mb-1">Code: {course.courseCode}</p>
-                  <p className="text-sm text-gray-600 mb-4">Lecturer: {course.lecturerName}</p>
+                  <p className="text-sm text-gray-600 mb-2">Lecturer: {course.lecturerName}</p>
                   <p className="text-sm text-gray-600 mb-4">{course.weeks?.length || 0} weeks</p>
                   <div className="flex gap-2">
                     <button

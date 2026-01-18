@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.nasow.com"),
+  metadataBase: new URL("https://www.nasowsunilag.com"),
   title: "Nasow UNILAG",
   description:
     "Nasow UNILAG is a platform dedicated to connecting students and alumni of the University of Lagos (UNILAG) for networking, collaboration, and career development opportunities.",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     title: "Nasow UNILAG",
     description:
       "Nasow UNILAG is a platform dedicated to connecting students and alumni of the University of Lagos (UNILAG) for networking, collaboration, and career development opportunities.",
-    url: "https://www.nasow.com/",
+    url: "https://www.nasowsunilag.com/",
     siteName: "Nasow UNILAG",
     images: [
       {
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased`}>
+      <body className={`${inter.variable} antialiased bg-white`}>
         <ToastProvider />
         <LayoutWrapper>
           {children}
