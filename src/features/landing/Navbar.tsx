@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { MoveRight, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { MoveRight, ChevronDown, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@/public/assets/logo.svg";
@@ -46,7 +46,6 @@ const navItems = [
       { name: "News & Events", url: "/events" },
       { name: "NASOWites of the Week", url: "/nasowite-of-the-week" },
       { name: "Our Sponsors", url: "/#sponsors" },
-      // { name: "Photo Gallery", url: "/gallery" },
     ],
   },
   { id: "6", name: "Contact Us", url: "/contact" },
@@ -55,6 +54,22 @@ const navItems = [
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [mobileDropdowns, setMobileDropdowns] = useState<Record<string, boolean>>({});
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check authentication status
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/check');
+        const data = await response.json();
+        setIsAuthenticated(data.isAuthenticated);
+      } catch (error) {
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const toggleMobileDropdown = (id: string) => {
     setMobileDropdowns((prev) => ({
@@ -130,14 +145,24 @@ const Navbar = () => {
               </div>
             ))}
 
-            {/* Portal Button */}
-            <Link
-              href="/portal"
-              className="ml-4 inline-flex items-center gap-2 rounded-xl bg-[#9179E0] px-6 py-3 text-white font-semibold shadow-lg hover:bg-[#7E6BDB] hover:scale-105 transition-all"
-            >
-              Portal
-              <MoveRight size={18} />
-            </Link>
+            {/* Portal Button - Changes based on auth status */}
+            {isAuthenticated ? (
+              <Link
+                href="/portal"
+                className="ml-4 inline-flex items-center gap-2 rounded-xl bg-[#9179E0] px-6 py-3 text-white font-semibold shadow-lg hover:bg-[#7E6BDB] hover:scale-105 transition-all"
+              >
+                <User size={18} />
+                Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/portal"
+                className="ml-4 inline-flex items-center gap-2 rounded-xl bg-[#9179E0] px-6 py-3 text-white font-semibold shadow-lg hover:bg-[#7E6BDB] hover:scale-105 transition-all"
+              >
+                Portal
+                <MoveRight size={18} />
+              </Link>
+            )}
           </div>
 
           {/* Mobile Toggle */}
@@ -221,16 +246,27 @@ const Navbar = () => {
             </div>
           ))}
 
-          {/* Mobile Portal */}
+          {/* Mobile Portal - Changes based on auth status */}
           <div className="pt-4">
-            <Link
-              href="/portal"
-              onClick={() => setIsOpen(false)}
-              className="w-full flex justify-center items-center gap-2 rounded-xl bg-[#9179E0] px-8 py-3.5 text-white font-semibold shadow-xl hover:bg-[#7E6BDB]"
-            >
-              Login to Portal
-              <MoveRight size={20} />
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                href="/portal"
+                onClick={() => setIsOpen(false)}
+                className="w-full flex justify-center items-center gap-2 rounded-xl bg-[#9179E0] px-8 py-3.5 text-white font-semibold shadow-xl hover:bg-[#7E6BDB]"
+              >
+                <User size={20} />
+                Go to Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/portal"
+                onClick={() => setIsOpen(false)}
+                className="w-full flex justify-center items-center gap-2 rounded-xl bg-[#9179E0] px-8 py-3.5 text-white font-semibold shadow-xl hover:bg-[#7E6BDB]"
+              >
+                Login to Portal
+                <MoveRight size={20} />
+              </Link>
+            )}
           </div>
 
           {/* Footer */}

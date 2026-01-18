@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Eye, EyeOff, Loader2, X, Save, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit2, Trash2, Loader2, X, Save, Image as ImageIcon } from 'lucide-react';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaGlobe } from 'react-icons/fa';
 import Image from 'next/image';
 

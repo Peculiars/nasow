@@ -46,15 +46,16 @@ export default function Home() {
         <MeetTheExecutives/>
       </ScrollAnimationWrapper>
       
+      <ScrollAnimationWrapper animation="zoom-in">
+        <BusinessBannerCarousel />
+      </ScrollAnimationWrapper>
+      
       <ScrollAnimationWrapper animation="fade-up">
         <OurSponsors/>
       </ScrollAnimationWrapper>
       
       <ScrollAnimationWrapper animation="fade-up" delay={0.1}>
         <UpcomingNewsAndEvents/>
-      </ScrollAnimationWrapper>
-      <ScrollAnimationWrapper animation="zoom-in">
-        <BusinessBannerCarousel />
       </ScrollAnimationWrapper>
     </main>
   );
