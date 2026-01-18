@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 
 async function getLecturer(id: string) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://nasow.vercel.app/' || 'http://localhost:3000'}/api/lecturers?id=${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://nasowsunilag.com/' || 'https://nasow.vercel.app/' || 'http://localhost:3000'}/api/lecturers?id=${id}`, {
       cache: 'no-store',
     });
 
