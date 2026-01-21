@@ -161,7 +161,7 @@ const UpcomingNewsAndEvents = () => {
                     </p>
 
                     <Link
-                      href={`/${item.type}s/${item.slug}`}
+                      href={`/events/${item.type}s/${item.slug}`}
                       className="flex items-center justify-center gap-2 w-full bg-[#9179E0]/10 hover:bg-[#9179E0] text-[#9179E0] hover:text-white font-semibold text-sm py-3 rounded-lg transition-all duration-300 group/link"
                     >
                       Learn More
@@ -223,7 +223,7 @@ const UpcomingNewsAndEvents = () => {
                     </p>
 
                     <Link
-                      href={`/${item.type}s/${item.slug}`}
+                      href={`/events/${item.type}s/${item.slug}`}
                       className="inline-flex items-center gap-1.5 text-[#9179E0] hover:text-[#7E6BDB] font-semibold text-sm group/link transition-colors"
                     >
                       Read More
