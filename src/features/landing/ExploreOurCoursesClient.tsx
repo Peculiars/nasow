@@ -242,11 +242,11 @@ export default function ExploreCoursesClient({ courses }: ExploreCoursesClientPr
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute top-4 left-4 flex flex-col gap-2">
-                  <div className={`text-xs font-bold ${getLevelColor(course.level)} text-white px-3 py-1.5 rounded-lg shadow-lg backdrop-blur-sm`}>
+                <div className="absolute bottom-2 left-4 flex space-x-2">
+                  <div className={`text-xs font-bold ${getLevelColor(course.level)} text-white px-2 py-1 rounded-lg shadow-lg backdrop-blur-sm`}>
                     {formatLevel(course.level)}
                   </div>
-                  <div className="text-xs font-semibold bg-white/90 backdrop-blur-sm text-gray-700 px-3 py-1.5 rounded-lg shadow-lg">
+                  <div className="text-xs font-semibold bg-white/90 backdrop-blur-sm text-gray-700 px-2 py-1 rounded-lg shadow-lg">
                     {formatStudentType(course.studentType)}
                   </div>
                 </div>
