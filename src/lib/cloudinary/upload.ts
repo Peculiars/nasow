@@ -83,9 +83,9 @@ export async function uploadCourseMaterial(
         {
           folder: 'nasows/courses/materials',
           resource_type: 'raw',
-          type: 'upload', // ✅ Make it public (not authenticated)
-          access_mode: 'public', // ✅ Ensure public access
-          format: file.name.split('.').pop()
+          type: 'upload',
+          access_mode: 'public',
+          invalidate: true,
         },
         (error, result) => {
           if (error) reject(error);

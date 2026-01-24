@@ -10,9 +10,11 @@ export async function uploadBannerImage(file: File): Promise<UploadResult> {
   try {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+
     const optimizedBuffer = await sharp(buffer)
       .resize(1200, 400, { 
-        fit: 'cover',
+        fit: 'contain',  
+        background: { r: 255, g: 255, b: 255, alpha: 1 }, 
         position: 'center'
       })
       .jpeg({ quality: 90, progressive: true })

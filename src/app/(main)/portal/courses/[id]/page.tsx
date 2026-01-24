@@ -106,10 +106,15 @@ export default function CourseDetailPage() {
     return "📎";
   };
 
-  const openMaterial = (material: Material) => {
-    window.open(material.url, "_blank");
-    showSuccess(`Opening ${material.name}`);
-  };
+const openMaterial = (material: Material) => {
+  // Use the download API endpoint to proxy the file
+  const downloadUrl = `/api/download?url=${encodeURIComponent(material.url)}&filename=${encodeURIComponent(material.name)}`;
+  
+  // Open in new tab - this will trigger the download
+  window.open(downloadUrl, '_blank');
+  
+  showSuccess(`Downloading ${material.name}`);
+};
 
   if (isLoading) {
     return (

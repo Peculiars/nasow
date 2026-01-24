@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "fix-cloudinary": "tsx scripts/fix-cloudinary-access.ts",
     "lint": "eslint"
   },
   "dependencies": {
