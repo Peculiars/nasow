@@ -144,10 +144,10 @@ const NewsEventDetailPage = () => {
                   <span>{item.time}</span>
                 </div>
               )}
-              <div className="flex items-center gap-2">
+              {/* <div className="flex items-center gap-2">
                 <Eye className="w-5 h-5" />
                 <span>{item.views} views</span>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -297,7 +297,7 @@ const NewsEventDetailPage = () => {
                   {relatedItems.map((related) => (
                     <Link
                       key={related._id}
-                      href={`/${related.type}s/${related.slug}`}
+                      href={`/events/${related.type}s/${related.slug}`}
                       className="group block"
                     >
                       <div className="flex gap-3">
