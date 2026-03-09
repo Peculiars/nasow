@@ -12,8 +12,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.nasowsunilag.com"),
   title: "Nasow UNILAG",
-  description:
-    "Nasow UNILAG is a platform dedicated to connecting students and alumni of the University of Lagos (UNILAG) for networking, collaboration, and career development opportunities.",
+  description: "Nasow UNILAG is a platform dedicated to connecting students and alumni of the University of Lagos (UNILAG) for networking, collaboration, and career development opportunities.",
   icons: {
     icon: "/favicon.ico",
   },

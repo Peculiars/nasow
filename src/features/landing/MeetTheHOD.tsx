@@ -9,20 +9,19 @@ const MeetTheHOD = () => {
     image: "/assets/hod.png",
     education: [
       "PhD in Social Work, University of Lagos",
-      "MSc in Clinical Social Work, University of Ibadan",
-      "BSc in Social Work, Obafemi Awolowo University"
+      "MSc in Sociology, University of Ibadan",
+      "BSc in Sociology, University of Ibadan, Ibadan, Nigeria"
     ],
     specialization: "Community Development & Social Policy",
     yearsOfService: "15+ Years",
-    email: "hod.socialwork@unilag.edu.ng",
-    phone: "+234 803 456 7890",
-    office: "Faculty of Social Sciences, Room 204",
+    email: "communicationunit@unilag.edu.ng",
+    office: "Faculty of Social Sciences",
     quote: "Social work is not just a profession; it's a calling to serve humanity with compassion, dignity, and unwavering commitment to justice.",
     achievements: [
-      "Published 40+ research papers in international journals",
+      "Published 10+ research papers in international journals",
       "Recipient of UNILAG Excellence in Teaching Award 2022",
       "Principal Investigator on 5 major community development projects",
-      "Member, National Association of Social Workers (NASW)"
+      "Federal Government Scholar- 2002"
     ],
     officeHours: "Monday - Friday: 10:00 AM - 3:00 PM"
   };
@@ -74,13 +73,13 @@ const MeetTheHOD = () => {
                   <Mail className="w-4 h-4 mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform" />
                   <span className="break-all">{hod.email}</span>
                 </a>
-                <a
+                {/* <a
                   href={`tel:${hod.phone}`}
                   className="flex items-start gap-3 text-sm text-gray-700 hover:text-[#9179E0] transition-colors group"
                 >
                   <Phone className="w-4 h-4 mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform" />
                   <span>{hod.phone}</span>
-                </a>
+                </a> */}
                 <div className="flex items-start gap-3 text-sm text-gray-700">
                   <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span>{hod.office}</span>
