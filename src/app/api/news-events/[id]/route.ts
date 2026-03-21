@@ -16,7 +16,7 @@ export async function GET(
   try {
     await connectDB();
 
-    const { id } = await params; // ✅ await params
+    const { id } = await params;
 
     const newsEvent = await NewsEvent.findById(id);
 
@@ -27,8 +27,8 @@ export async function GET(
       );
     }
 
-    await NewsEvent.findByIdAndUpdate(id, { $inc: { views: 1 } });
-
+    // Return the news/event data WITHOUT incrementing views
+    // View tracking will be handled by a separate endpoint
     return NextResponse.json({
       success: true,
       data: newsEvent
@@ -61,7 +61,7 @@ export async function PUT(
 
     await connectDB();
 
-    const { id } = await params; // ✅ await params
+    const { id } = await params;
 
     const existingNewsEvent = await NewsEvent.findById(id);
     if (!existingNewsEvent) {
@@ -196,7 +196,7 @@ export async function DELETE(
 
     await connectDB();
 
-    const { id } = await params; // ✅ await params
+    const { id } = await params;
 
     const newsEvent = await NewsEvent.findById(id);
     if (!newsEvent) {
