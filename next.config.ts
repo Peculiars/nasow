@@ -22,14 +22,12 @@ const nextConfig: NextConfig = {
     ],
   },
   
+  // ✅ This fixes the 413 Payload Too Large error
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',
     },
   },
-  
-  // ✅ Add this as well if the above doesn't work
-  serverRuntimeConfig: {
-    maxDuration: 60, // Maximum execution time in seconds
-  },
 };
+
+export default nextConfig;
