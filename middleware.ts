@@ -8,7 +8,14 @@ export default function middleware(req: NextRequest) {
     "/signup",
     "/about",
     "/contact",
-    "/api/auth",
+    "/events",
+    "/executives",
+    "/lecturers",
+    "/nasowite-of-the-week",
+    "/terms",
+    "/api/auth",           // All Kinde auth routes
+    "/api/banners",        // Public API routes
+    "/api/news-events",
   ];
 
   const isPublicPath = publicPaths.some((path) =>
