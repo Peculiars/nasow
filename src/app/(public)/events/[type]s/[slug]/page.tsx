@@ -11,12 +11,20 @@ const NewsEventDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
   const [relatedItems, setRelatedItems] = useState<any[]>([]);
+  const [viewTracked, setViewTracked] = useState(false);
 
   useEffect(() => {
     if (params?.slug) {
       fetchItem();
     }
   }, [params?.slug]);
+
+  // Track view only once per session using localStorage
+  useEffect(() => {
+    if (item && !viewTracked) {
+      trackView();
+    }
+  }, [item, viewTracked]);
 
   const fetchItem = async () => {
     setLoading(true);
@@ -39,6 +47,47 @@ const NewsEventDetailPage = () => {
       console.error('Failed to fetch:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const trackView = async () => {
+    if (!item?._id) return;
+
+    // Check if this item was already viewed in this browser session
+    const viewedItems = JSON.parse(localStorage.getItem('viewedNewsEvents') || '{}');
+    const lastViewTime = viewedItems[item._id];
+    
+    // Only track if not viewed before, or if last view was more than 24 hours ago
+    const oneDayInMs = 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    
+    if (!lastViewTime || (now - lastViewTime) > oneDayInMs) {
+      try {
+        const response = await fetch(`/api/news-events/${item._id}/view`, {
+          method: 'POST',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Update local state with new view count
+          setItem((prev: any) => ({
+            ...prev,
+            views: data.views
+          }));
+
+          // Update localStorage to prevent duplicate tracking
+          viewedItems[item._id] = now;
+          localStorage.setItem('viewedNewsEvents', JSON.stringify(viewedItems));
+          
+          setViewTracked(true);
+        }
+      } catch (error) {
+        console.error('Failed to track view:', error);
+      }
+    } else {
+      // Already viewed recently, don't track but mark as tracked
+      setViewTracked(true);
     }
   };
 
@@ -144,10 +193,10 @@ const NewsEventDetailPage = () => {
                   <span>{item.time}</span>
                 </div>
               )}
-              {/* <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <Eye className="w-5 h-5" />
-                <span>{item.views} views</span>
-              </div> */}
+                <span>{item.views || 0} views</span>
+              </div>
             </div>
           </div>
         </div>
