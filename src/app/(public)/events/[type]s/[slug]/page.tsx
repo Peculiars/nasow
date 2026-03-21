@@ -1,3 +1,6 @@
+// ============================================
+// FILE 2: Updated NewsEventDetailPage Component
+// ============================================
 "use client"
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
@@ -10,6 +13,7 @@ const NewsEventDetailPage = () => {
   const [item, setItem] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
   const [relatedItems, setRelatedItems] = useState<any[]>([]);
   const [viewTracked, setViewTracked] = useState(false);
 
@@ -25,6 +29,16 @@ const NewsEventDetailPage = () => {
       trackView();
     }
   }, [item, viewTracked]);
+
+  // Check if user has already liked this item
+  useEffect(() => {
+    if (item?._id) {
+      const likedItems = JSON.parse(localStorage.getItem('likedNewsEvents') || '{}');
+      const isLiked = likedItems[item._id] || false;
+      setLiked(isLiked);
+      setLikeCount(item.likes || 0);
+    }
+  }, [item]);
 
   const fetchItem = async () => {
     setLoading(true);
@@ -53,11 +67,9 @@ const NewsEventDetailPage = () => {
   const trackView = async () => {
     if (!item?._id) return;
 
-    // Check if this item was already viewed in this browser session
     const viewedItems = JSON.parse(localStorage.getItem('viewedNewsEvents') || '{}');
     const lastViewTime = viewedItems[item._id];
     
-    // Only track if not viewed before, or if last view was more than 24 hours ago
     const oneDayInMs = 24 * 60 * 60 * 1000;
     const now = Date.now();
     
@@ -70,13 +82,11 @@ const NewsEventDetailPage = () => {
         if (response.ok) {
           const data = await response.json();
           
-          // Update local state with new view count
           setItem((prev: any) => ({
             ...prev,
             views: data.views
           }));
 
-          // Update localStorage to prevent duplicate tracking
           viewedItems[item._id] = now;
           localStorage.setItem('viewedNewsEvents', JSON.stringify(viewedItems));
           
@@ -86,13 +96,63 @@ const NewsEventDetailPage = () => {
         console.error('Failed to track view:', error);
       }
     } else {
-      // Already viewed recently, don't track but mark as tracked
       setViewTracked(true);
     }
   };
 
-  const handleLike = () => {
-    setLiked(!liked);
+  const handleLike = async () => {
+    if (!item?._id) return;
+
+    // Optimistic UI update
+    const newLikedState = !liked;
+    const newLikeCount = newLikedState ? likeCount + 1 : likeCount - 1;
+    
+    setLiked(newLikedState);
+    setLikeCount(newLikeCount);
+
+    try {
+      const response = await fetch(`/api/news-events/${item._id}/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: newLikedState ? 'like' : 'unlike'
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Update with actual count from server
+        setLikeCount(data.likes);
+
+        // Update localStorage
+        const likedItems = JSON.parse(localStorage.getItem('likedNewsEvents') || '{}');
+        if (newLikedState) {
+          likedItems[item._id] = true;
+        } else {
+          delete likedItems[item._id];
+        }
+        localStorage.setItem('likedNewsEvents', JSON.stringify(likedItems));
+
+        // Update the item state
+        setItem((prev: any) => ({
+          ...prev,
+          likes: data.likes
+        }));
+      } else {
+        // Revert on error
+        setLiked(!newLikedState);
+        setLikeCount(likeCount);
+        console.error('Failed to update like');
+      }
+    } catch (error) {
+      // Revert on error
+      setLiked(!newLikedState);
+      setLikeCount(likeCount);
+      console.error('Failed to update like:', error);
+    }
   };
 
   const handleShare = async () => {
@@ -210,10 +270,14 @@ const NewsEventDetailPage = () => {
                 <div className="flex gap-3">
                   <button
                     onClick={handleLike}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${liked ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+                      liked 
+                        ? 'bg-red-50 text-red-600 hover:bg-red-100' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
                   >
-                    <Heart className={`w-5 h-5 ${liked ? 'fill-red-600' : ''}`} />
-                    {item.likes + (liked ? 1 : 0)}
+                    <Heart className={`w-5 h-5 transition-all ${liked ? 'fill-red-600' : ''}`} />
+                    {likeCount}
                   </button>
                   <button
                     onClick={handleShare}
