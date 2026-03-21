@@ -1,6 +1,4 @@
-// ============================================
-// FILE 2: Updated NewsEventDetailPage Component
-// ============================================
+
 "use client"
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
