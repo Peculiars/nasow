@@ -1,7 +1,8 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
-import { MoveRight, ChevronDown, User } from "lucide-react";
+import { MoveRight, ChevronDown, User, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@/public/assets/logo.svg";
@@ -55,21 +56,32 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [mobileDropdowns, setMobileDropdowns] = useState<Record<string, boolean>>({});
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [portalLoading, setPortalLoading] = useState(false);
 
   useEffect(() => {
-    // Check authentication status
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('/api/auth/check');
-        const data = await response.json();
-        setIsAuthenticated(data.isAuthenticated);
-      } catch (error) {
-        setIsAuthenticated(false);
-      }
-    };
-
     checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch('/api/auth/check');
+      const data = await response.json();
+      setIsAuthenticated(data.isAuthenticated);
+    } catch (error) {
+      setIsAuthenticated(false);
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handlePortalClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      setPortalLoading(true);
+      window.location.href = '/login';
+    }
+  };
 
   const toggleMobileDropdown = (id: string) => {
     setMobileDropdowns((prev) => ({
@@ -104,6 +116,7 @@ const Navbar = () => {
               />
             </Link>
           </div>
+
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center space-x-8">
             {navItems.map((item) => (
@@ -121,10 +134,8 @@ const Navbar = () => {
                   )}
                 </Link>
 
-                {/* Underline */}
                 <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-[#9179E0] group-hover:w-full transition-all duration-300" />
 
-                {/* Desktop Dropdown */}
                 {item.dropdown && (
                   <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
                     <div className="w-56 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden">
@@ -145,8 +156,13 @@ const Navbar = () => {
               </div>
             ))}
 
-            {/* Portal Button - Changes based on auth status */}
-            {isAuthenticated ? (
+            {/* Portal Button */}
+            {authLoading ? (
+              <div className="ml-4 inline-flex items-center gap-2 rounded-xl bg-gray-200 px-6 py-3 text-gray-400 font-semibold">
+                <Loader2 size={18} className="animate-spin" />
+                Loading...
+              </div>
+            ) : isAuthenticated ? (
               <Link
                 href="/portal"
                 className="ml-4 inline-flex items-center gap-2 rounded-xl bg-[#9179E0] px-6 py-3 text-white font-semibold shadow-lg hover:bg-[#7E6BDB] hover:scale-105 transition-all"
@@ -155,13 +171,23 @@ const Navbar = () => {
                 Dashboard
               </Link>
             ) : (
-              <Link
-                href="/portal"
-                className="ml-4 inline-flex items-center gap-2 rounded-xl bg-[#9179E0] px-6 py-3 text-white font-semibold shadow-lg hover:bg-[#7E6BDB] hover:scale-105 transition-all"
+              <button
+                onClick={handlePortalClick}
+                disabled={portalLoading}
+                className="ml-4 inline-flex items-center gap-2 rounded-xl bg-[#9179E0] px-6 py-3 text-white font-semibold shadow-lg hover:bg-[#7E6BDB] hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Portal
-                <MoveRight size={18} />
-              </Link>
+                {portalLoading ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    Portal
+                    <MoveRight size={18} />
+                  </>
+                )}
+              </button>
             )}
           </div>
 
@@ -246,9 +272,14 @@ const Navbar = () => {
             </div>
           ))}
 
-          {/* Mobile Portal - Changes based on auth status */}
+          {/* Mobile Portal */}
           <div className="pt-4">
-            {isAuthenticated ? (
+            {authLoading ? (
+              <div className="w-full flex justify-center items-center gap-2 rounded-xl bg-gray-200 px-8 py-3.5 text-gray-400 font-semibold">
+                <Loader2 size={20} className="animate-spin" />
+                Loading...
+              </div>
+            ) : isAuthenticated ? (
               <Link
                 href="/portal"
                 onClick={() => setIsOpen(false)}
@@ -258,18 +289,29 @@ const Navbar = () => {
                 Go to Dashboard
               </Link>
             ) : (
-              <Link
-                href="/portal"
-                onClick={() => setIsOpen(false)}
-                className="w-full flex justify-center items-center gap-2 rounded-xl bg-[#9179E0] px-8 py-3.5 text-white font-semibold shadow-xl hover:bg-[#7E6BDB]"
+              <button
+                onClick={(e) => {
+                  handlePortalClick(e);
+                  setIsOpen(false);
+                }}
+                disabled={portalLoading}
+                className="w-full flex justify-center items-center gap-2 rounded-xl bg-[#9179E0] px-8 py-3.5 text-white font-semibold shadow-xl hover:bg-[#7E6BDB] disabled:opacity-50"
               >
-                Login to Portal
-                <MoveRight size={20} />
-              </Link>
+                {portalLoading ? (
+                  <>
+                    <Loader2 size={20} className="animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    Login to Portal
+                    <MoveRight size={20} />
+                  </>
+                )}
+              </button>
             )}
           </div>
 
-          {/* Footer */}
           <div className="text-center pt-6">
             <p className="text-xs text-gray-600">Designed by the</p>
             <p className="text-sm font-semibold text-[#9179E0]">
