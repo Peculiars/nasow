@@ -1,14 +1,10 @@
-
 "use client";
 import { LoginLink } from "@kinde-oss/kinde-auth-nextjs";
-import { LogIn, Shield, BookOpen, ArrowLeft, Loader2 } from "lucide-react";
+import { LogIn, Shield, BookOpen, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 
 export default function LoginPage() {
-  const [loadingType, setLoadingType] = useState<'student' | 'admin' | null>(null);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 font-inter">
       <div className="min-h-screen flex items-center justify-center px-4 py-12">
@@ -35,38 +31,18 @@ export default function LoginPage() {
             <div className="space-y-4">
               {/* Student Login */}
               <LoginLink
-                onClick={() => setLoadingType('student')}
-                className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-[#9179E0] text-white font-bold rounded-xl hover:bg-[#7E6BDB] transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-[#9179E0] text-white font-bold rounded-xl hover:bg-[#7E6BDB] transition-all duration-300 hover:scale-105 shadow-lg"
               >
-                {loadingType === 'student' ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Redirecting...
-                  </>
-                ) : (
-                  <>
-                    <BookOpen className="w-5 h-5" />
-                    Login as Student
-                  </>
-                )}
+                <BookOpen className="w-5 h-5" />
+                Login as Student
               </LoginLink>
 
               {/* Admin Login */}
               <LoginLink
-                onClick={() => setLoadingType('admin')}
-                className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white border-2 border-[#9179E0] text-[#9179E0] font-bold rounded-xl hover:bg-purple-50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white border-2 border-[#9179E0] text-[#9179E0] font-bold rounded-xl hover:bg-purple-50 transition-all duration-300 hover:scale-105"
               >
-                {loadingType === 'admin' ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Redirecting...
-                  </>
-                ) : (
-                  <>
-                    <Shield className="w-5 h-5" />
-                    Login as Admin
-                  </>
-                )}
+                <Shield className="w-5 h-5" />
+                Login as Admin
               </LoginLink>
             </div>
 
