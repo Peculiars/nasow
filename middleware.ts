@@ -8,17 +8,8 @@ export default function middleware(req: NextRequest) {
     "/signup",
     "/about",
     "/contact",
-    "/events",
-    "/executives",
-    "/lecturers",
-    "/nasowite-of-the-week",
-    "/terms",
+    "/api/auth",
   ];
-
-  // Allow all /api routes (including Kinde auth)
-  if (req.nextUrl.pathname.startsWith("/api")) {
-    return NextResponse.next();
-  }
 
   const isPublicPath = publicPaths.some((path) =>
     req.nextUrl.pathname.startsWith(path)
